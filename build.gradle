@@ -1,0 +1,41 @@
+plugins {
+    id 'org.springframework.boot' version '2.6.6'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+}
+
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    group = 'com.my'
+    sourceCompatibility = '1.11'
+
+    bootJar {
+        enabled = false
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        compileOnly('org.projectlombok:lombok')
+        annotationProcessor('org.projectlombok:lombok')
+
+        implementation('org.springframework.boot:spring-boot-starter-web')
+
+        runtimeOnly('org.springframework.boot:spring-boot-devtools')
+        compileOnly('org.springframework.boot:spring-boot-configuration-processor')
+
+        testImplementation('org.springframework.boot:spring-boot-starter-test')
+    }
+
+}
