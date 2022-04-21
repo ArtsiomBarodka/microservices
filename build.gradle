@@ -18,6 +18,8 @@ allprojects {
     group = 'com.my'
     sourceCompatibility = '1.11'
 
+    ext['springCloudVersion'] = '2021.0.1'
+
     bootJar {
         enabled = false
     }
@@ -31,6 +33,7 @@ allprojects {
         annotationProcessor('org.projectlombok:lombok')
 
         implementation('org.springframework.boot:spring-boot-starter-web')
+        implementation('org.springframework.cloud:spring-cloud-starter-bootstrap')
 
         runtimeOnly('org.springframework.boot:spring-boot-devtools')
         compileOnly('org.springframework.boot:spring-boot-configuration-processor')
@@ -38,4 +41,9 @@ allprojects {
         testImplementation('org.springframework.boot:spring-boot-starter-test')
     }
 
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        }
+    }
 }

@@ -2,4 +2,5 @@ rootProject.name = 'microservices'
 
 include 'order'
 include 'customer'
+include 'config-server'
 
