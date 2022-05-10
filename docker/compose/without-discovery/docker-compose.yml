@@ -1,0 +1,87 @@
+version: '3'
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "22181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "29092:29092"
+    healthcheck:
+      test: ["CMD", "nc", "-vz", "localhost", "29092"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  config-server:
+    image: application/config-server:latest
+    depends_on:
+      kafka:
+          condition: service_healthy
+    ports:
+      - "8888:8888"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    environment:
+      SERVER_PORT: 8888
+      EUREKA_CLIENT_ENABLED: "false"
+      GIT_TOKEN: ${GIT_TOKEN}
+      KAFKA_URI: http://kafka:9092
+
+  order:
+    image: application/order:latest
+    depends_on:
+      config-server:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    ports:
+      - "8081:8081"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    environment:
+      SERVER_PORT: 8081
+      EUREKA_CLIENT_ENABLED: "false"
+      CONFIG_URI: http://config-server:8888/
+      KAFKA_URI: http://kafka:9092
+
+  customer:
+    image: application/customer:latest
+    depends_on:
+      config-server:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    ports:
+      - "8082:8082"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    environment:
+      SERVER_PORT: 8082
+      EUREKA_CLIENT_ENABLED: "false"
+      CONFIG_URI: http://config-server:8888/
+      KAFKA_URI: http://kafka:9092
