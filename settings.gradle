@@ -1,7 +1,7 @@
 rootProject.name = 'microservices'
 
 include 'order'
-include 'customer'
+include 'product'
 include 'config-server'
 include 'discovery-server'
 

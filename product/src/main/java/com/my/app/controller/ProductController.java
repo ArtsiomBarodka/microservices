@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RefreshScope
 @RestController
-@RequestMapping("/api/v1/customers")
-public class CustomerController {
+@RequestMapping("/api/v1/products")
+public class ProductController {
     @Value("${app.service.name}")
     private String name;
 

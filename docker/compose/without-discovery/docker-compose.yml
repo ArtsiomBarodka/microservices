@@ -66,8 +66,8 @@ services:
       CONFIG_URI: http://config-server:8888/
       KAFKA_URI: http://kafka:9092
 
-  customer:
-    image: application/customer:latest
+  product:
+    image: application/product:latest
     depends_on:
       config-server:
         condition: service_healthy
