@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.my.app.model.Product;
 import lombok.Data;
-import lombok.ToString;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -27,6 +26,7 @@ public class Order {
     private BigDecimal totalCost;
 
     @ManyToOne
+    @JsonIgnoreProperties("orders")
     @JoinColumn(name = "fk_user_id", nullable = false)
     private User user;
 

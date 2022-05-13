@@ -1,8 +1,8 @@
 package com.my.app.service.impl;
 
-import com.my.app.model.entity.User;
-import com.my.app.repository.UserRepository;
-import com.my.app.service.UserService;
+import com.my.app.model.entity.Order;
+import com.my.app.repository.OrderRepository;
+import com.my.app.service.OrderService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -12,18 +12,18 @@ import java.util.Collection;
 
 @Service
 @AllArgsConstructor
-public class UserServiceImpl implements UserService {
-    private final UserRepository userRepository;
+public class OrderServiceImpl implements OrderService {
+    private final OrderRepository orderRepository;
 
     @Override
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    public User getUserById(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User is not founded"));
+    public Order getOrderById(Long id) {
+        return orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order is not founded"));
     }
 
     @Override
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    public Collection<User> getAllUsers() {
-        return userRepository.findAll();
+    public Collection<Order> getAllOrders() {
+        return orderRepository.findAll();
     }
 }

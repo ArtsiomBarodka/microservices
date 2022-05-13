@@ -6,5 +6,9 @@ import org.springframework.lang.NonNull;
 import java.util.Collection;
 
 public interface OrderService {
-    @NonNull Collection<Order> getAllOrders();
+    @NonNull
+    Order getOrderById(@NonNull Long id);
+
+    @NonNull
+    Collection<Order> getAllOrders();
 }
