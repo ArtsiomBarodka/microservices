@@ -10,6 +10,10 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    springCloudVersion = "2021.0.1"
+}
+
 allprojects {
     apply plugin: 'java'
     apply plugin: 'org.springframework.boot'
@@ -17,8 +21,6 @@ allprojects {
 
     group = 'com.my'
     sourceCompatibility = '1.11'
-
-    ext['springCloudVersion'] = '2021.0.1'
 
     bootJar {
         enabled = false
