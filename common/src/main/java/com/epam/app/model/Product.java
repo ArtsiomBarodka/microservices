@@ -1,11 +1,11 @@
-package com.my.app.model;
+package com.epam.app.model;
 
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 @Data
-public class Product {
+public abstract class Product {
     private Long id;
     private String name;
     private String description;

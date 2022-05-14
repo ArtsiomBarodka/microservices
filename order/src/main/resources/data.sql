@@ -6,9 +6,9 @@
  INSERT INTO `microservices`.`product_id` (product_id) VALUES (2);
  INSERT INTO `microservices`.`product_id` (product_id) VALUES (3);
 
- INSERT INTO `microservices`.`order_table` (created, total_price, fk_user_id) VALUES (CURRENT_TIMESTAMP, 2500, 1);
- INSERT INTO `microservices`.`order_table` (created, total_price, fk_user_id) VALUES (CURRENT_TIMESTAMP, 1500, 2);
- INSERT INTO `microservices`.`order_table` (created, total_price, fk_user_id) VALUES (CURRENT_TIMESTAMP, 500, 1);
+ INSERT INTO `microservices`.`order_table` (created, fk_user_id) VALUES (CURRENT_TIMESTAMP, 1);
+ INSERT INTO `microservices`.`order_table` (created, fk_user_id) VALUES (CURRENT_TIMESTAMP, 2);
+ INSERT INTO `microservices`.`order_table` (created, fk_user_id) VALUES (CURRENT_TIMESTAMP, 1);
 
  INSERT INTO `microservices`.`order_item` (fk_product_id, fk_order_id, count) VALUES (1, 1, 1);
  INSERT INTO `microservices`.`order_item` (fk_product_id, fk_order_id, count) VALUES (1, 2, 1);

@@ -4,6 +4,7 @@ import com.my.app.model.entity.User;
 import com.my.app.repository.UserRepository;
 import com.my.app.service.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,12 +18,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    public User getUserById(Long id) {
+    @NonNull
+    public User getUserById(@NonNull Long id) {
         return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User is not founded"));
     }
 
     @Override
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    @NonNull
     public Collection<User> getAllUsers() {
         return userRepository.findAll();
     }

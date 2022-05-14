@@ -1,13 +1,11 @@
 package com.my.app.controller;
 
+import com.my.app.config.PropertiesConfig;
 import com.my.app.model.entity.Order;
 import com.my.app.model.entity.User;
 import com.my.app.service.OrderService;
 import com.my.app.service.UserService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,25 +16,19 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
-import java.util.List;
 
 @Validated
-@RefreshScope
+@AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1/orders")
 public class OrderController {
-    @Autowired
     private UserService userService;
-
-    @Autowired
     private OrderService orderService;
-
-    @Value("${app.service.name}")
-    private String name;
+    private PropertiesConfig propertiesConfig;
 
     @GetMapping("/health")
-    public String healthCheck(){
-        return "Hello from " + name;
+    public String healthCheck() {
+        return "Hello from " + propertiesConfig.getName();
     }
 
     @GetMapping

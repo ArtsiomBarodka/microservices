@@ -1,4 +1,4 @@
-package com.my.app.model;
+package com.epam.app.model;
 
 public enum Category {
     SMARTPHONE,

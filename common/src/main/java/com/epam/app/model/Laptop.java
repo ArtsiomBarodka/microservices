@@ -1,11 +1,11 @@
-package com.my.app.model;
+package com.epam.app.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
-public class Laptop extends Product {
+@EqualsAndHashCode(callSuper = true)
+public class Laptop extends Product{
     private String storage;
     private String ram;
     private String processor;

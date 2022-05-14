@@ -1,7 +1,6 @@
 package com.my.app.repository;
 
 import com.my.app.model.entity.Order;
-import com.my.app.model.entity.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.lang.NonNull;
