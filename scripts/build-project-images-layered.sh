@@ -30,11 +30,11 @@ gradle clean bootJar
 echo "Unpacking JARs"
 unpack config-server config-server
 unpack discovery-server discovery-server
-unpack customer customer
+unpack product product
 unpack order order
 
 echo "Building Docker image"
 build config-server application/config-server
 build discovery-server application/discovery-server
-build customer application/customer
+build product application/product
 build order application/order

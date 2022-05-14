@@ -28,6 +28,24 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
+  mysql:
+    image: mysql:8.0
+    volumes:
+      - mysql:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "-u$$MYSQL_USER", "-p$$MYSQL_ROOT_PASSWORD",  "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    restart: always
+    environment:
+      MYSQL_DATABASE: microservices
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+
   discovery-server:
     image: application/discovery-server:latest
     ports:
@@ -69,6 +87,8 @@ services:
         condition: service_healthy
       kafka:
         condition: service_healthy
+      mysql:
+        condition: service_healthy
     ports:
       - "8081:8081"
     healthcheck:
@@ -81,6 +101,7 @@ services:
       EUREKA_URI: http://discovery-server:8761/eureka/
       CONFIG_URI: http://config-server:8888/
       KAFKA_URI: http://kafka:9092
+      MYSQL_URL: mysql:3306
 
   product:
     image: application/product:latest
@@ -103,3 +124,6 @@ services:
       EUREKA_URI: http://discovery-server:8761/eureka/
       CONFIG_URI: http://config-server:8888/
       KAFKA_URI: http://kafka:9092
+
+volumes:
+  mysql:
