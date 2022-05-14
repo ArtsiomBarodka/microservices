@@ -45,6 +45,9 @@ public class FromDtoToViewOrderConverter implements Converter<OrderDto, OrderVie
     };
 
     private static final Converter<ProductDto, ProductView> productConverter = source -> {
+        if(source == null){
+            return ProductView.builder().build();
+        }
         if (source.getCategory() == Category.LAPTOP && source instanceof LaptopDto) {
             final LaptopDto laptop = (LaptopDto) source;
             return ProductView.builder()

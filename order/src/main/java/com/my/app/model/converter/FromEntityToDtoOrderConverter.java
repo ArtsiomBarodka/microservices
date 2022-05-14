@@ -30,6 +30,7 @@ public class FromEntityToDtoOrderConverter implements Converter<Order, OrderDto>
     private static final Converter<OrderItem, OrderItemDto> orderItemConverter = source -> {
         return OrderItemDto.builder()
                 .id(source.getId())
+                .productId(source.getProduct().getProductId())
                 .count(source.getCount())
                 .build();
     };

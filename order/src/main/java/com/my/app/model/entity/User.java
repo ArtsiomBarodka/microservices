@@ -1,6 +1,5 @@
 package com.my.app.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -20,7 +19,6 @@ public class User {
     @Column(name = "email", nullable = false)
     private String email;
 
-    @JsonIgnoreProperties("user")
     @OneToMany(mappedBy = "user", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private List<Order> orders;
 }
