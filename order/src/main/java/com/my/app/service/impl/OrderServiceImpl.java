@@ -63,7 +63,7 @@ public class OrderServiceImpl implements OrderService {
     public Collection<OrderDto> getAllOrders() {
         final List<Order> orderEntities = orderRepository.findAll();
 
-        final Map<Long, Product> products = orderEntities.stream()
+        final Map<Long, Product> productsMap = orderEntities.stream()
                 .map(Order::getOrderItems)
                 .flatMap(Collection::stream)
                 .map(OrderItem::getProduct)
@@ -74,8 +74,8 @@ public class OrderServiceImpl implements OrderService {
         final List<OrderDto> orderDtoList = orderEntities.stream().map(orderConverter::convert).collect(toList());
 
         for (OrderDto orderDto : orderDtoList) {
-            for (OrderItemDto orderItem : orderDto.getOrderItems()) {
-                orderItem.setProduct(productConverter.convert(products.get(orderItem.getProductId())));
+            for (OrderItemDto orderItemDto : orderDto.getOrderItems()) {
+                orderItemDto.setProduct(productConverter.convert(productsMap.get(orderItemDto.getProductId())));
             }
         }
 

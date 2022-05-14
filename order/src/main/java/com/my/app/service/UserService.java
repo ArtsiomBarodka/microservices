@@ -1,14 +1,14 @@
 package com.my.app.service;
 
-import com.my.app.model.entity.User;
+import com.my.app.model.dto.UserDto;
 import org.springframework.lang.NonNull;
 
 import java.util.Collection;
 
 public interface UserService {
     @NonNull
-    User getUserById(@NonNull Long id);
+    UserDto getUserById(@NonNull Long id);
 
     @NonNull
-    Collection<User> getAllUsers();
+    Collection<UserDto> getAllUsers();
 }
