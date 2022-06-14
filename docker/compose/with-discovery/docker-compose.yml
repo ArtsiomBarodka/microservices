@@ -46,6 +46,38 @@ services:
       MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: password
 
+  mongodb:
+    image: mongo:5.0
+    volumes:
+      - mongodb:/data/db
+    ports:
+      - "27017:27017"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD","mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: user
+      MONGO_INITDB_ROOT_PASSWORD: password
+
+  mongo-express:
+    image: mongo-express:latest
+    depends_on:
+      - mongodb
+    volumes:
+      - mongodb
+    ports:
+      - "8881:8081"
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
+      ME_CONFIG_MONGODB_ADMINUSERNAME: user
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: password
+
   discovery-server:
     image: application/discovery-server:latest
     ports:
@@ -112,6 +144,8 @@ services:
         condition: service_healthy
       kafka:
         condition: service_healthy
+      mongodb:
+        condition: service_healthy
     ports:
       - "8082:8082"
     healthcheck:
@@ -124,6 +158,8 @@ services:
       EUREKA_URI: http://discovery-server:8761/eureka/
       CONFIG_URI: http://config-server:8888/
       KAFKA_URI: http://kafka:9092
+      MONGO_DB_HOST: mongodb
+      MONGO_DB_PORT: 27017
 
   api-gateway:
     image: application/api-gateway:latest
@@ -149,3 +185,4 @@ services:
 
 volumes:
   mysql:
+  mongodb:

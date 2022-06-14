@@ -49,7 +49,7 @@ services:
       - "27017:27017"
     restart: unless-stopped
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongo 10.10.10.60:27017/test --quiet
+      test: ["CMD","mongo", "--eval", "db.adminCommand('ping')"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -60,11 +60,12 @@ services:
   mongo-express:
     image: mongo-express:latest
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_healthy
     volumes:
       - mongodb
     ports:
-      - "8081:8081"
+      - "8881:8081"
     environment:
       ME_CONFIG_MONGODB_SERVER: mongodb
       ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
