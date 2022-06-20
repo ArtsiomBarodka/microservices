@@ -1,6 +1,7 @@
 package com.my.app.model;
 
 import com.epam.app.model.Category;
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -11,6 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
+@Builder
 @Document
 public class Product {
     @Id
