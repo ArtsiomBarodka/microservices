@@ -2,10 +2,11 @@ package com.my.app.model.converter;
 
 import com.epam.app.model.Category;
 import com.my.app.model.dto.*;
-import com.my.app.model.view.OrderItemView;
-import com.my.app.model.view.OrderView;
-import com.my.app.model.view.ProductView;
-import com.my.app.model.view.UserView;
+import com.my.app.model.response.OrderItemResponse;
+import com.my.app.model.response.OrderResponse;
+import com.my.app.model.response.ProductResponse;
+import com.my.app.model.response.UserResponse;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -15,50 +16,50 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 
 @Component
-public class FromDtoToVewUserConverter implements Converter<UserDto, UserView> {
+public class FromDtoToResponseUserConverter implements Converter<UserDto, UserResponse> {
     @Override
     @NonNull
-    public UserView convert(@NonNull UserDto source) {
-        return UserView.builder()
+    public UserResponse convert(@NonNull UserDto source) {
+        return UserResponse.builder()
                 .id(source.getId())
                 .name(source.getName())
                 .email(source.getEmail())
                 .orders(source.getOrders()
                         .stream()
-                        .map(FromDtoToVewUserConverter.orderConverter::convert)
+                        .map(FromDtoToResponseUserConverter.orderConverter::convert)
                         .collect(toList()))
                 .build();
     }
 
-    private static final Converter<OrderDto, OrderView> orderConverter = source -> {
-        List<OrderItemView> orderItems = source.getOrderItems()
+    private static final Converter<OrderDto, OrderResponse> orderConverter = source -> {
+        List<OrderItemResponse> orderItems = source.getOrderItems()
                 .stream()
-                .map(FromDtoToVewUserConverter.orderItemConverter::convert)
+                .map(FromDtoToResponseUserConverter.orderItemConverter::convert)
                 .collect(toList());
 
-        return OrderView.builder()
+        return OrderResponse.builder()
                 .id(source.getId())
                 .created(source.getCreated())
                 .totalCost(orderItems.stream()
-                        .map(OrderItemView::getProduct)
-                        .map(ProductView::getCost)
+                        .map(OrderItemResponse::getProduct)
+                        .map(ProductResponse::getCost)
                         .reduce(BigDecimal.ZERO, BigDecimal::add))
                 .orderItems(orderItems)
                 .build();
     };
 
-    private static final Converter<OrderItemDto, OrderItemView> orderItemConverter = source -> {
-        return OrderItemView.builder()
+    private static final Converter<OrderItemDto, OrderItemResponse> orderItemConverter = source -> {
+        return OrderItemResponse.builder()
                 .id(source.getId())
                 .count(source.getCount())
-                .product(FromDtoToVewUserConverter.productConverter.convert(source.getProduct()))
+                .product(FromDtoToResponseUserConverter.productConverter.convert(source.getProduct()))
                 .build();
     };
 
-    private static final Converter<ProductDto, ProductView> productConverter = source -> {
+    private static final Converter<ProductDto, ProductResponse> productConverter = source -> {
         if (source.getCategory() == Category.LAPTOP && source instanceof LaptopDto) {
             final LaptopDto laptop = (LaptopDto) source;
-            return ProductView.builder()
+            return ProductResponse.builder()
                     .id(laptop.getId())
                     .name(laptop.getName())
                     .description(laptop.getDescription())
@@ -70,7 +71,7 @@ public class FromDtoToVewUserConverter implements Converter<UserDto, UserView> {
                     .build();
         } else if (source.getCategory() == Category.SMARTPHONE && source instanceof SmartphoneDto) {
             final SmartphoneDto smartphone = (SmartphoneDto) source;
-            return ProductView.builder()
+            return ProductResponse.builder()
                     .id(smartphone.getId())
                     .name(smartphone.getName())
                     .description(smartphone.getDescription())

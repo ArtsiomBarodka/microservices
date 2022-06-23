@@ -1,17 +1,14 @@
-ext{
-    mySqlConnectorVersion = "8.0.22"
-}
-
 dependencies {
     implementation project(':common')
     
     implementation('org.springframework.cloud:spring-cloud-config-client')
     implementation('org.springframework.cloud:spring-cloud-starter-bus-kafka')
     implementation('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
+    implementation('org.springframework.cloud:spring-cloud-starter-openfeign')
 
     implementation('org.springframework.boot:spring-boot-starter-data-jpa')
     
-    implementation("mysql:mysql-connector-java:$mySqlConnectorVersion")
+    implementation("mysql:mysql-connector-java:${mySqlConnectorVersion}")
 }
 
 bootJar {

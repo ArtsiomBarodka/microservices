@@ -7,6 +7,7 @@ import com.epam.app.model.Smartphone;
 import com.my.app.model.dto.LaptopDto;
 import com.my.app.model.dto.ProductDto;
 import com.my.app.model.dto.SmartphoneDto;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 

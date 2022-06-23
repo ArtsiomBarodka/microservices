@@ -1,8 +1,9 @@
-package com.my.app.configuration;
+package com.my.app.config;
 
 import com.epam.app.model.Category;
-import com.my.app.model.Product;
 import com.my.app.model.ProductDetail;
+import com.my.app.model.entity.Product;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -19,9 +20,6 @@ import org.springframework.batch.item.data.builder.MongoItemWriterBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -30,19 +28,12 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.util.List;
 
 @Slf4j
-@RefreshScope
+@AllArgsConstructor
 @Configuration
 @EnableBatchProcessing
-public class BatchConfiguration {
-    @Autowired
+public class BatchConfig {
     private MongoTemplate mongoTemplate;
-
-    @Value("${app.products.data.path}")
-    private String productsDataPath;
-
-    @Value("${app.products.data.collection}")
-    private String productsCollection;
-
+    private PropertiesConfig propertiesConfig;
 
     @Bean
     public Job loadProductsJob(JobBuilderFactory jobBuilderFactory,
@@ -58,7 +49,7 @@ public class BatchConfiguration {
 
                     @Override
                     public void afterJob(JobExecution jobExecution) {
-                        final List<Product> products = mongoTemplate.findAll(Product.class, productsCollection);
+                        final List<Product> products = mongoTemplate.findAll(Product.class, propertiesConfig.getProductsCollection());
                         log.info("Data loading is finished");
                         log.info("There were load {} products", products.size());
                         products.forEach(product -> log.info(product.toString()));
@@ -81,7 +72,7 @@ public class BatchConfiguration {
     public Tasklet dropTableTasklet() {
         return (stepContribution, chunkContext) -> {
             log.info("Drop product table in MongoDB");
-            mongoTemplate.dropCollection(productsCollection);
+            mongoTemplate.dropCollection(propertiesConfig.getProductsCollection());
             return RepeatStatus.FINISHED;
         };
     }
@@ -105,10 +96,10 @@ public class BatchConfiguration {
     @Bean
     public FlatFileItemReader<ProductDetail> csvReader() {
         return new FlatFileItemReaderBuilder<ProductDetail>().name("csv-reader")
-                .resource(new ClassPathResource(productsDataPath))
+                .resource(new ClassPathResource(propertiesConfig.getProductsDataPath()))
                 .targetType(ProductDetail.class)
                 .delimited()
-                .names("name", "description", "cost", "category", "storage", "ram", "processor", "hasBluetooth")
+                .names("id","name", "description", "cost", "category", "storage", "ram", "processor", "hasBluetooth")
                 .build();
     }
 
@@ -120,6 +111,7 @@ public class BatchConfiguration {
                 throw new IllegalArgumentException(String.format("Wrong category value %s", item.getCategory()));
 
             return Product.builder()
+                    .id(item.getId())
                     .name(item.getName())
                     .description(item.getDescription())
                     .cost(item.getCost())
@@ -135,7 +127,7 @@ public class BatchConfiguration {
     @Bean
     public MongoItemWriter<Product> writer() {
         return new MongoItemWriterBuilder<Product>()
-                .template(mongoTemplate).collection(productsCollection)
+                .template(mongoTemplate).collection(propertiesConfig.getProductsCollection())
                 .build();
     }
 }

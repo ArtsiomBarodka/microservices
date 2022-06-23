@@ -1,4 +1,4 @@
-package com.my.app.model.view;
+package com.my.app.model.response;
 
 import com.epam.app.model.Category;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ProductView {
+public class ProductResponse {
     private Long id;
     private String name;
     private String description;

@@ -1,4 +1,4 @@
-package com.my.app.model.view;
+package com.my.app.model.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -15,14 +15,14 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class OrderView {
+public class OrderResponse {
     private Long id;
 
     private LocalDateTime created;
 
     private BigDecimal totalCost;
 
-    private UserView user;
+    private UserResponse user;
 
-    private List<OrderItemView> orderItems;
+    private List<OrderItemResponse> orderItems;
 }

@@ -14,6 +14,6 @@ public enum Category {
             .collect(Collectors.toMap(Enum::name, Function.identity()));
 
     public static Category of(String name) {
-        return categories.get(name.toUpperCase());
+        return categories.get(name);
     }
 }

@@ -6,6 +6,7 @@ import com.my.app.model.dto.UserDto;
 import com.my.app.model.entity.Order;
 import com.my.app.model.entity.OrderItem;
 import com.my.app.model.entity.User;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 

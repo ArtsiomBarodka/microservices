@@ -52,11 +52,7 @@ public class UserServiceImpl implements UserService {
 
         final UserDto userDto = userConverter.convert(userEntity);
 
-        for (OrderDto orderDto : userDto.getOrders()) {
-            for (OrderItemDto orderItemDto : orderDto.getOrderItems()) {
-                orderItemDto.setProduct(productConverter.convert(productsMap.get(orderItemDto.getProductId())));
-            }
-        }
+        populateUsers(List.of(userDto), productsMap);
 
         return userDto;
     }
@@ -77,17 +73,21 @@ public class UserServiceImpl implements UserService {
                 .map(this::fetchProduct)
                 .collect(toMap(Product::getId, Function.identity(), (x1, x2) -> x1));
 
-        final List<UserDto> orderDtoList = userEntities.stream().map(userConverter::convert).collect(toList());
+        final List<UserDto> userDtoList = userEntities.stream().map(userConverter::convert).collect(toList());
 
-        for (UserDto userDto : orderDtoList) {
+        populateUsers(userDtoList, productsMap);
+
+        return userDtoList;
+    }
+
+    private void populateUsers(List<UserDto> userDtoList, Map<Long, Product> productsMap) {
+        for (UserDto userDto : userDtoList) {
             for (OrderDto orderDto : userDto.getOrders()) {
                 for (OrderItemDto orderItemDto : orderDto.getOrderItems()) {
                     orderItemDto.setProduct(productConverter.convert(productsMap.get(orderItemDto.getProductId())));
                 }
             }
         }
-
-        return orderDtoList;
     }
 
     private Product fetchProduct(Long id) {

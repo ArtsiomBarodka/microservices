@@ -1,4 +1,4 @@
-package com.my.app.model.view;
+package com.my.app.model.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class OrderItemView {
+public class OrderItemResponse {
     private Long id;
 
-    private ProductView product;
+    private ProductResponse product;
 
     private Integer count;
 }

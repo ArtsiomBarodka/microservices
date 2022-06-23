@@ -1,8 +1,8 @@
 package com.my.app.controller;
 
-import com.my.app.model.converter.FromDtoToVewUserConverter;
+import com.my.app.model.converter.FromDtoToResponseUserConverter;
 import com.my.app.model.dto.UserDto;
-import com.my.app.model.view.UserView;
+import com.my.app.model.response.UserResponse;
 import com.my.app.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,16 +24,16 @@ import static java.util.stream.Collectors.toList;
 @RequestMapping("/api/v1/users")
 public class UserController {
     private UserService userService;
-    private FromDtoToVewUserConverter userConverter;
+    private FromDtoToResponseUserConverter userConverter;
 
     @GetMapping
-    public ResponseEntity<Collection<UserView>> getAllUsers() {
+    public ResponseEntity<Collection<UserResponse>> getAllUsers() {
         final Collection<UserDto> userDtoList = userService.getAllUsers();
         return ResponseEntity.ok(userDtoList.stream().map(userConverter::convert).collect(toList()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserView> getUserById(@PathVariable @NotNull @Min(1) Long id) {
+    public ResponseEntity<UserResponse> getUserById(@PathVariable @NotNull @Min(1) Long id) {
         final UserDto userDto = userService.getUserById(id);
         return ResponseEntity.ok(userConverter.convert(userDto));
     }

@@ -50,9 +50,7 @@ public class OrderServiceImpl implements OrderService {
 
         final OrderDto orderDto = orderConverter.convert(orderEntity);
 
-        for (OrderItemDto orderItem : orderDto.getOrderItems()) {
-            orderItem.setProduct(productConverter.convert(products.get(orderItem.getProductId())));
-        }
+        populateOrders(List.of(orderDto), products);
 
         return orderDto;
     }
@@ -73,13 +71,17 @@ public class OrderServiceImpl implements OrderService {
 
         final List<OrderDto> orderDtoList = orderEntities.stream().map(orderConverter::convert).collect(toList());
 
+        populateOrders(orderDtoList, productsMap);
+
+        return orderDtoList;
+    }
+
+    private void populateOrders(List<OrderDto> orderDtoList, final Map<Long, Product> productsMap) {
         for (OrderDto orderDto : orderDtoList) {
             for (OrderItemDto orderItemDto : orderDto.getOrderItems()) {
                 orderItemDto.setProduct(productConverter.convert(productsMap.get(orderItemDto.getProductId())));
             }
         }
-
-        return orderDtoList;
     }
 
     private Product fetchProduct(Long id) {
