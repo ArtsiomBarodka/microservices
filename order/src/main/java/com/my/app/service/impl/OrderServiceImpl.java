@@ -1,8 +1,8 @@
 package com.my.app.service.impl;
 
-import com.epam.app.model.Laptop;
-import com.epam.app.model.Product;
-import com.epam.app.model.Smartphone;
+import com.epam.app.model.ProductListRequest;
+import com.epam.app.model.ProductResponse;
+import com.my.app.client.ProductClient;
 import com.my.app.model.converter.FromEntityToDtoOrderConverter;
 import com.my.app.model.converter.FromResponseToDtoProductConverter;
 import com.my.app.model.dto.OrderDto;
@@ -18,19 +18,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.*;
 
 @Service
 @AllArgsConstructor
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
+    private final ProductClient productClient;
     private final FromEntityToDtoOrderConverter orderConverter;
     private final FromResponseToDtoProductConverter productConverter;
 
@@ -41,16 +41,13 @@ public class OrderServiceImpl implements OrderService {
         final Order orderEntity = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order is not founded"));
 
-        final Map<Long, Product> products = orderEntity.getOrderItems()
-                .stream()
-                .map(OrderItem::getProduct)
-                .map(ProductId::getProductId)
-                .map(this::fetchProduct)
-                .collect(toMap(Product::getId, Function.identity(), (x1, x2) -> x1));
+        final Set<String> ids = getProductsIds(List.of(orderEntity));
+
+        final Map<String, ProductResponse> productsMap = getProducts(ids);
 
         final OrderDto orderDto = orderConverter.convert(orderEntity);
 
-        populateOrders(List.of(orderDto), products);
+        populateOrders(List.of(orderDto), productsMap);
 
         return orderDto;
     }
@@ -61,50 +58,42 @@ public class OrderServiceImpl implements OrderService {
     public Collection<OrderDto> getAllOrders() {
         final List<Order> orderEntities = orderRepository.findAll();
 
-        final Map<Long, Product> productsMap = orderEntities.stream()
-                .map(Order::getOrderItems)
-                .flatMap(Collection::stream)
-                .map(OrderItem::getProduct)
-                .map(ProductId::getProductId)
-                .map(this::fetchProduct)
-                .collect(toMap(Product::getId, Function.identity(), (x1, x2) -> x1));
+        final Set<String> ids = getProductsIds(orderEntities);
 
-        final List<OrderDto> orderDtoList = orderEntities.stream().map(orderConverter::convert).collect(toList());
+        final Map<String, ProductResponse> productsMap = getProducts(ids);
+
+        final List<OrderDto> orderDtoList = orderEntities.stream()
+                .map(orderConverter::convert)
+                .collect(toList());
 
         populateOrders(orderDtoList, productsMap);
 
         return orderDtoList;
     }
 
-    private void populateOrders(List<OrderDto> orderDtoList, final Map<Long, Product> productsMap) {
+    private Set<String> getProductsIds(List<Order> orderEntities) {
+        return orderEntities.stream()
+                .map(Order::getOrderItems)
+                .flatMap(Collection::stream)
+                .map(OrderItem::getProduct)
+                .map(ProductId::getProductId)
+                .collect(toSet());
+    }
+
+    private Map<String, ProductResponse> getProducts(Set<String> ids) {
+        final ProductListRequest productListRequest = ProductListRequest.builder().ids(ids).build();
+
+        return productClient
+                .getAllProductsByIds(productListRequest)
+                .stream()
+                .collect(toMap(ProductResponse::getId, Function.identity()));
+    }
+
+    private void populateOrders(List<OrderDto> orderDtoList, final Map<String, ProductResponse> productsMap) {
         for (OrderDto orderDto : orderDtoList) {
             for (OrderItemDto orderItemDto : orderDto.getOrderItems()) {
                 orderItemDto.setProduct(productConverter.convert(productsMap.get(orderItemDto.getProductId())));
             }
-        }
-    }
-
-    private Product fetchProduct(Long id) {
-        final long random = Math.round(Math.random());
-        if (1 == random) {
-            return Laptop.builder()
-                    .id(id)
-                    .name("Macbook PRO")
-                    .description("ultrabook for professionals")
-                    .cost(BigDecimal.valueOf(5500))
-                    .processor("Intel Core i7")
-                    .ram("16 Gb")
-                    .storage("500 Gb")
-                    .build();
-        } else {
-            return Smartphone.builder()
-                    .id(id)
-                    .name("Iphone X")
-                    .description("smartphone for all")
-                    .cost(BigDecimal.valueOf(3500))
-                    .storage("500 Gb")
-                    .hasBluetooth(true)
-                    .build();
         }
     }
 }

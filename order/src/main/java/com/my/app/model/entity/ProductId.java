@@ -13,5 +13,5 @@ public class ProductId {
     private Long id;
 
     @Column(name = "product_id", nullable = false, unique = true)
-    private Long productId;
+    private String productId;
 }

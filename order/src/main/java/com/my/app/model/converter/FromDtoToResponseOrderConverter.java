@@ -1,10 +1,12 @@
 package com.my.app.model.converter;
 
-import com.epam.app.model.Category;
-import com.my.app.model.dto.*;
+import com.epam.app.model.ProductResponse;
+import com.my.app.model.dto.OrderDto;
+import com.my.app.model.dto.OrderItemDto;
+import com.my.app.model.dto.ProductDto;
+import com.my.app.model.dto.UserDto;
 import com.my.app.model.response.OrderItemResponse;
 import com.my.app.model.response.OrderResponse;
-import com.my.app.model.response.ProductResponse;
 import com.my.app.model.response.UserResponse;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.NonNull;
@@ -17,6 +19,7 @@ import static java.util.stream.Collectors.toList;
 
 @Component
 public class FromDtoToResponseOrderConverter implements Converter<OrderDto, OrderResponse> {
+
     @Override
     @NonNull
     public OrderResponse convert(@NonNull OrderDto source) {
@@ -46,35 +49,17 @@ public class FromDtoToResponseOrderConverter implements Converter<OrderDto, Orde
     };
 
     private static final Converter<ProductDto, ProductResponse> productConverter = source -> {
-        if(source == null){
-            return ProductResponse.builder().build();
-        }
-        if (source.getCategory() == Category.LAPTOP && source instanceof LaptopDto) {
-            final LaptopDto laptop = (LaptopDto) source;
-            return ProductResponse.builder()
-                    .id(laptop.getId())
-                    .name(laptop.getName())
-                    .description(laptop.getDescription())
-                    .cost(laptop.getCost())
-                    .category(laptop.getCategory())
-                    .storage(laptop.getStorage())
-                    .ram(laptop.getRam())
-                    .processor(laptop.getProcessor())
-                    .build();
-        } else if (source.getCategory() == Category.SMARTPHONE && source instanceof SmartphoneDto) {
-            final SmartphoneDto smartphone = (SmartphoneDto) source;
-            return ProductResponse.builder()
-                    .id(smartphone.getId())
-                    .name(smartphone.getName())
-                    .description(smartphone.getDescription())
-                    .cost(smartphone.getCost())
-                    .category(smartphone.getCategory())
-                    .storage(smartphone.getStorage())
-                    .bluetooth(smartphone.getHasBluetooth())
-                    .build();
-        } else {
-            throw new RuntimeException("Unsupported product");
-        }
+        return ProductResponse.builder()
+                .id(source.getId())
+                .name(source.getName())
+                .description(source.getDescription())
+                .category(source.getCategory())
+                .cost(source.getCost())
+                .hasBluetooth(source.getHasBluetooth())
+                .processor(source.getProcessor())
+                .ram(source.getRam())
+                .storage(source.getStorage())
+                .build();
     };
 
     private static final Converter<UserDto, UserResponse> userConverter = source -> {

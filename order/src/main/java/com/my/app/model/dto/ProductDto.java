@@ -7,15 +7,20 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
-@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class ProductDto {
-    private Long id;
+public class ProductDto {
+    private String id;
     private String name;
     private String description;
     private BigDecimal cost;
     private Category category;
+
+    private String storage;
+    private String ram;
+    private String processor;
+    private Boolean hasBluetooth;
 }

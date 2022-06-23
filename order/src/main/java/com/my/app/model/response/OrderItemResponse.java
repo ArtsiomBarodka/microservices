@@ -1,5 +1,6 @@
 package com.my.app.model.response;
 
+import com.epam.app.model.ProductResponse;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

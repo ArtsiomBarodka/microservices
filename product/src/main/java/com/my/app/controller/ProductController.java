@@ -8,14 +8,10 @@ import com.my.app.model.dto.ProductDto;
 import com.my.app.service.ProductService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Collection;
-import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
@@ -33,10 +29,17 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<Collection<ProductResponse>> getAllProducts(@RequestBody @Valid Optional<ProductListRequest> productListRequest) {
-        final Collection<ProductDto> products = productListRequest
-                .map(listRequest -> productService.getAllProductsByIds(listRequest.getIds()))
-                .orElseGet(() -> productService.getAllProducts());
+    public ResponseEntity<Collection<ProductResponse>> getAllProducts() {
+        final Collection<ProductDto> products = productService.getAllProducts();
+
+        return ResponseEntity.ok(products.stream()
+                .map(productConverter::convert)
+                .collect(toList()));
+    }
+
+    @PostMapping
+    public ResponseEntity<Collection<ProductResponse>> getAllProductsByIds(@RequestBody @Valid ProductListRequest productListRequest) {
+        final Collection<ProductDto> products = productService.getAllProductsByIds(productListRequest.getIds());
 
         return ResponseEntity.ok(products.stream()
                 .map(productConverter::convert)

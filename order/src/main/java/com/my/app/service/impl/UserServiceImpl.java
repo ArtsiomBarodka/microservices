@@ -1,8 +1,8 @@
 package com.my.app.service.impl;
 
-import com.epam.app.model.Laptop;
-import com.epam.app.model.Product;
-import com.epam.app.model.Smartphone;
+import com.epam.app.model.ProductListRequest;
+import com.epam.app.model.ProductResponse;
+import com.my.app.client.ProductClient;
 import com.my.app.model.converter.FromEntityToDtoUserConverter;
 import com.my.app.model.converter.FromResponseToDtoProductConverter;
 import com.my.app.model.dto.OrderDto;
@@ -20,19 +20,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.*;
 
 @Service
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final ProductClient productClient;
     private final FromEntityToDtoUserConverter userConverter;
     private final FromResponseToDtoProductConverter productConverter;
 
@@ -42,13 +42,9 @@ public class UserServiceImpl implements UserService {
     public UserDto getUserById(@NonNull Long id) {
         final User userEntity = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User is not founded"));
 
-        final Map<Long, Product> productsMap = userEntity.getOrders().stream()
-                .map(Order::getOrderItems)
-                .flatMap(Collection::stream)
-                .map(OrderItem::getProduct)
-                .map(ProductId::getProductId)
-                .map(this::fetchProduct)
-                .collect(toMap(Product::getId, Function.identity(), (x1, x2) -> x1));
+        final Set<String> ids = getProductsIds(List.of(userEntity));
+
+        final Map<String, ProductResponse> productsMap = getProducts(ids);
 
         final UserDto userDto = userConverter.convert(userEntity);
 
@@ -63,15 +59,9 @@ public class UserServiceImpl implements UserService {
     public Collection<UserDto> getAllUsers() {
         final List<User> userEntities = userRepository.findAll();
 
-        final Map<Long, Product> productsMap = userEntities.stream()
-                .map(User::getOrders)
-                .flatMap(Collection::stream)
-                .map(Order::getOrderItems)
-                .flatMap(Collection::stream)
-                .map(OrderItem::getProduct)
-                .map(ProductId::getProductId)
-                .map(this::fetchProduct)
-                .collect(toMap(Product::getId, Function.identity(), (x1, x2) -> x1));
+        final Set<String> ids = getProductsIds(userEntities);
+
+        final Map<String, ProductResponse> productsMap = getProducts(ids);
 
         final List<UserDto> userDtoList = userEntities.stream().map(userConverter::convert).collect(toList());
 
@@ -80,37 +70,33 @@ public class UserServiceImpl implements UserService {
         return userDtoList;
     }
 
-    private void populateUsers(List<UserDto> userDtoList, Map<Long, Product> productsMap) {
+    private Set<String> getProductsIds(List<User> userEntities) {
+        return userEntities.stream()
+                .map(User::getOrders)
+                .flatMap(Collection::stream)
+                .map(Order::getOrderItems)
+                .flatMap(Collection::stream)
+                .map(OrderItem::getProduct)
+                .map(ProductId::getProductId)
+                .collect(toSet());
+    }
+
+    private Map<String, ProductResponse> getProducts(Set<String> ids) {
+        final ProductListRequest productListRequest = ProductListRequest.builder().ids(ids).build();
+
+        return productClient
+                .getAllProductsByIds(productListRequest)
+                .stream()
+                .collect(toMap(ProductResponse::getId, Function.identity()));
+    }
+
+    private void populateUsers(List<UserDto> userDtoList, Map<String, ProductResponse> productsMap) {
         for (UserDto userDto : userDtoList) {
             for (OrderDto orderDto : userDto.getOrders()) {
                 for (OrderItemDto orderItemDto : orderDto.getOrderItems()) {
                     orderItemDto.setProduct(productConverter.convert(productsMap.get(orderItemDto.getProductId())));
                 }
             }
-        }
-    }
-
-    private Product fetchProduct(Long id) {
-        final long random = Math.round(Math.random());
-        if (1 == random) {
-            return Laptop.builder()
-                    .id(id)
-                    .name("Macbook PRO")
-                    .description("ultrabook for professionals")
-                    .cost(BigDecimal.valueOf(5500))
-                    .processor("Intel Core i7")
-                    .ram("16 Gb")
-                    .storage("500 Gb")
-                    .build();
-        } else {
-            return Smartphone.builder()
-                    .id(id)
-                    .name("Iphone X")
-                    .description("smartphone for all")
-                    .cost(BigDecimal.valueOf(3500))
-                    .storage("500 Gb")
-                    .hasBluetooth(true)
-                    .build();
         }
     }
 }
