@@ -1,5 +1,6 @@
 package com.my.app.service.impl;
 
+import com.epam.app.exception.ObjectNotFoundException;
 import com.epam.app.model.ProductListRequest;
 import com.epam.app.model.ProductResponse;
 import com.my.app.client.ProductClient;
@@ -40,15 +41,16 @@ public class UserServiceImpl implements UserService {
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     @NonNull
     public UserDto getUserById(@NonNull Long id) {
-        final User userEntity = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User is not founded"));
-
-        final Set<String> ids = getProductsIds(List.of(userEntity));
-
-        final Map<String, ProductResponse> productsMap = getProducts(ids);
+        final User userEntity = userRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("User is not found"));
 
         final UserDto userDto = userConverter.convert(userEntity);
 
-        populateUsers(List.of(userDto), productsMap);
+        final Set<String> ids = getProductsIds(List.of(userEntity));
+        if (!ids.isEmpty()) {
+            final Map<String, ProductResponse> productsMap = getProducts(ids);
+            populateUsers(List.of(userDto), productsMap);
+        }
 
         return userDto;
     }
@@ -59,13 +61,15 @@ public class UserServiceImpl implements UserService {
     public Collection<UserDto> getAllUsers() {
         final List<User> userEntities = userRepository.findAll();
 
+        final List<UserDto> userDtoList = userEntities.stream()
+                .map(userConverter::convert)
+                .collect(toList());
+
         final Set<String> ids = getProductsIds(userEntities);
-
-        final Map<String, ProductResponse> productsMap = getProducts(ids);
-
-        final List<UserDto> userDtoList = userEntities.stream().map(userConverter::convert).collect(toList());
-
-        populateUsers(userDtoList, productsMap);
+        if (!ids.isEmpty()) {
+            final Map<String, ProductResponse> productsMap = getProducts(ids);
+            populateUsers(userDtoList, productsMap);
+        }
 
         return userDtoList;
     }
@@ -94,7 +98,11 @@ public class UserServiceImpl implements UserService {
         for (UserDto userDto : userDtoList) {
             for (OrderDto orderDto : userDto.getOrders()) {
                 for (OrderItemDto orderItemDto : orderDto.getOrderItems()) {
-                    orderItemDto.setProduct(productConverter.convert(productsMap.get(orderItemDto.getProductId())));
+                    ProductResponse productResponse = productsMap.get(orderItemDto.getProductId());
+                    if (productResponse == null) {
+                        throw new ObjectNotFoundException("Order item does not have a product");
+                    }
+                    orderItemDto.setProduct(productConverter.convert(productResponse));
                 }
             }
         }

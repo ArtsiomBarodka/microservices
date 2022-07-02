@@ -65,7 +65,8 @@ services:
   mongo-express:
     image: mongo-express:latest
     depends_on:
-      - mongodb
+      mongodb:
+        condition: service_healthy
     volumes:
       - mongodb
     ports:

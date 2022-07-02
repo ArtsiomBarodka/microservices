@@ -1,5 +1,7 @@
 package com.my.app.service.impl;
 
+import com.epam.app.exception.IncorrectArgumentException;
+import com.epam.app.exception.ObjectNotFoundException;
 import com.epam.app.model.ProductListRequest;
 import com.epam.app.model.ProductResponse;
 import com.my.app.client.ProductClient;
@@ -39,14 +41,15 @@ public class OrderServiceImpl implements OrderService {
     @NonNull
     public OrderDto getOrderById(@NonNull Long id) {
         final Order orderEntity = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order is not founded"));
-
-        final Set<String> ids = getProductsIds(List.of(orderEntity));
-
-        final Map<String, ProductResponse> productsMap = getProducts(ids);
+                .orElseThrow(() -> new ObjectNotFoundException("Order is not found"));
 
         final OrderDto orderDto = orderConverter.convert(orderEntity);
 
+        final Set<String> ids = getProductsIds(List.of(orderEntity));
+        if(ids.isEmpty()) {
+            throw new IncorrectArgumentException("It should be at least 1 products id");
+        }
+        final Map<String, ProductResponse> productsMap = getProducts(ids);
         populateOrders(List.of(orderDto), productsMap);
 
         return orderDto;
@@ -58,14 +61,15 @@ public class OrderServiceImpl implements OrderService {
     public Collection<OrderDto> getAllOrders() {
         final List<Order> orderEntities = orderRepository.findAll();
 
-        final Set<String> ids = getProductsIds(orderEntities);
-
-        final Map<String, ProductResponse> productsMap = getProducts(ids);
-
         final List<OrderDto> orderDtoList = orderEntities.stream()
                 .map(orderConverter::convert)
                 .collect(toList());
 
+        final Set<String> ids = getProductsIds(orderEntities);
+        if(ids.isEmpty()) {
+            throw new IncorrectArgumentException("It should be at least 1 products id");
+        }
+        final Map<String, ProductResponse> productsMap = getProducts(ids);
         populateOrders(orderDtoList, productsMap);
 
         return orderDtoList;
@@ -92,7 +96,11 @@ public class OrderServiceImpl implements OrderService {
     private void populateOrders(List<OrderDto> orderDtoList, final Map<String, ProductResponse> productsMap) {
         for (OrderDto orderDto : orderDtoList) {
             for (OrderItemDto orderItemDto : orderDto.getOrderItems()) {
-                orderItemDto.setProduct(productConverter.convert(productsMap.get(orderItemDto.getProductId())));
+                ProductResponse productResponse = productsMap.get(orderItemDto.getProductId());
+                if (productResponse == null) {
+                    throw new ObjectNotFoundException("Order item does not have a product");
+                }
+                orderItemDto.setProduct(productConverter.convert(productResponse));
             }
         }
     }

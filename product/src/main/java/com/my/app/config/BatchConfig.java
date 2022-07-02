@@ -1,5 +1,6 @@
 package com.my.app.config;
 
+import com.epam.app.exception.ObjectNotFoundException;
 import com.epam.app.model.Category;
 import com.my.app.model.ProductDetail;
 import com.my.app.model.entity.Product;
@@ -87,7 +88,7 @@ public class BatchConfig {
                 .reader(reader)
                 .processor(processor)
                 .faultTolerant()
-                .skip(IllegalArgumentException.class)
+                .skip(ObjectNotFoundException.class)
                 .skipLimit(3)
                 .writer(writer)
                 .build();
@@ -108,7 +109,7 @@ public class BatchConfig {
         return item -> {
             final Category category = Category.of(item.getCategory());
             if (category == null)
-                throw new IllegalArgumentException(String.format("Wrong category value %s", item.getCategory()));
+                throw new ObjectNotFoundException(String.format("Not found Category with value %s", item.getCategory()));
 
             return Product.builder()
                     .id(item.getId())
