@@ -14,14 +14,18 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 import static java.util.stream.Collectors.toList;
 
 @Component
 public class FromDtoToResponseUserConverter implements Converter<UserDto, UserResponse> {
     @Override
-    @NonNull
-    public UserResponse convert(@NonNull UserDto source) {
+    public UserResponse convert(UserDto source) {
+        if (source == null){
+            return null;
+        }
+
         return UserResponse.builder()
                 .id(source.getId())
                 .name(source.getName())
@@ -34,6 +38,10 @@ public class FromDtoToResponseUserConverter implements Converter<UserDto, UserRe
     }
 
     private static final Converter<OrderDto, OrderResponse> orderConverter = source -> {
+        if (source == null){
+            return null;
+        }
+
         List<OrderItemResponse> orderItems = source.getOrderItems()
                 .stream()
                 .map(FromDtoToResponseUserConverter.orderItemConverter::convert)
@@ -43,28 +51,36 @@ public class FromDtoToResponseUserConverter implements Converter<UserDto, UserRe
                 .id(source.getId())
                 .created(source.getCreated())
                 .totalCost(orderItems.stream()
-                        .map(OrderItemResponse::getProduct)
-                        .map(ProductResponse::getCost)
+                        .filter(Objects::nonNull)
+                        .map(OrderItemResponse::getCost)
                         .reduce(BigDecimal.ZERO, BigDecimal::add))
                 .orderItems(orderItems)
                 .build();
     };
 
     private static final Converter<OrderItemDto, OrderItemResponse> orderItemConverter = source -> {
+        if (source == null){
+            return null;
+        }
+
         return OrderItemResponse.builder()
                 .id(source.getId())
+                .cost(source.getCost())
                 .count(source.getCount())
                 .product(FromDtoToResponseUserConverter.productConverter.convert(source.getProduct()))
                 .build();
     };
 
     private static final Converter<ProductDto, ProductResponse> productConverter = source -> {
+        if (source == null){
+            return null;
+        }
+
         return ProductResponse.builder()
                 .id(source.getId())
                 .name(source.getName())
                 .description(source.getDescription())
                 .category(source.getCategory())
-                .cost(source.getCost())
                 .hasBluetooth(source.getHasBluetooth())
                 .processor(source.getProcessor())
                 .ram(source.getRam())

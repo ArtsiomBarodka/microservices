@@ -97,9 +97,6 @@ public class OrderServiceImpl implements OrderService {
         for (OrderDto orderDto : orderDtoList) {
             for (OrderItemDto orderItemDto : orderDto.getOrderItems()) {
                 ProductResponse productResponse = productsMap.get(orderItemDto.getProductId());
-                if (productResponse == null) {
-                    throw new ObjectNotFoundException("Order item does not have a product");
-                }
                 orderItemDto.setProduct(productConverter.convert(productResponse));
             }
         }

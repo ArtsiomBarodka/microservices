@@ -14,8 +14,11 @@ public class FromDtoToResponseProductConverter implements Converter<ProductDto, 
     private final ModelMapper modelMapper;
 
     @Override
-    @NonNull
-    public ProductResponse convert(@NonNull ProductDto source) {
+    public ProductResponse convert(ProductDto source) {
+        if (source == null){
+            return null;
+        }
+
         return modelMapper.map(source, ProductResponse.class);
     }
 }

@@ -14,8 +14,11 @@ public class FromEntityToDtoProductConverter implements Converter<Product, Produ
     private final ModelMapper modelMapper;
 
     @Override
-    @NonNull
     public ProductDto convert(@NonNull Product source) {
+        if (source == null){
+            return null;
+        }
+
         return modelMapper.map(source, ProductDto.class);
     }
 }

@@ -15,8 +15,11 @@ import static java.util.stream.Collectors.toList;
 @Component
 public class FromEntityToDtoUserConverter implements Converter<User, UserDto> {
     @Override
-    @NonNull
-    public UserDto convert(@NonNull User source) {
+    public UserDto convert(User source) {
+        if (source == null){
+            return null;
+        }
+
         return UserDto.builder()
                 .id(source.getId())
                 .name(source.getName())
@@ -29,6 +32,10 @@ public class FromEntityToDtoUserConverter implements Converter<User, UserDto> {
     }
 
     private static final Converter<Order, OrderDto> orderConverter = source -> {
+        if (source == null){
+            return null;
+        }
+
         return OrderDto.builder()
                 .id(source.getId())
                 .created(source.getCreated())
@@ -40,9 +47,14 @@ public class FromEntityToDtoUserConverter implements Converter<User, UserDto> {
     };
 
     private static final Converter<OrderItem, OrderItemDto> orderItemConverter = source -> {
+        if (source == null){
+            return null;
+        }
+
         return OrderItemDto.builder()
                 .id(source.getId())
                 .productId(source.getProduct().getProductId())
+                .cost(source.getCost())
                 .count(source.getCount())
                 .build();
     };
