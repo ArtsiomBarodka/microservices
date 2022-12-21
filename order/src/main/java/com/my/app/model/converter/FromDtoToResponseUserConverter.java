@@ -21,11 +21,8 @@ import static java.util.stream.Collectors.toList;
 @Component
 public class FromDtoToResponseUserConverter implements Converter<UserDto, UserResponse> {
     @Override
-    public UserResponse convert(UserDto source) {
-        if (source == null){
-            return null;
-        }
-
+    @NonNull
+    public UserResponse convert(@NonNull UserDto source) {
         return UserResponse.builder()
                 .id(source.getId())
                 .name(source.getName())
@@ -38,10 +35,6 @@ public class FromDtoToResponseUserConverter implements Converter<UserDto, UserRe
     }
 
     private static final Converter<OrderDto, OrderResponse> orderConverter = source -> {
-        if (source == null){
-            return null;
-        }
-
         List<OrderItemResponse> orderItems = source.getOrderItems()
                 .stream()
                 .map(FromDtoToResponseUserConverter.orderItemConverter::convert)
@@ -59,10 +52,6 @@ public class FromDtoToResponseUserConverter implements Converter<UserDto, UserRe
     };
 
     private static final Converter<OrderItemDto, OrderItemResponse> orderItemConverter = source -> {
-        if (source == null){
-            return null;
-        }
-
         return OrderItemResponse.builder()
                 .id(source.getId())
                 .cost(source.getCost())
@@ -72,10 +61,6 @@ public class FromDtoToResponseUserConverter implements Converter<UserDto, UserRe
     };
 
     private static final Converter<ProductDto, ProductResponse> productConverter = source -> {
-        if (source == null){
-            return null;
-        }
-
         return ProductResponse.builder()
                 .id(source.getId())
                 .name(source.getName())

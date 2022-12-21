@@ -20,6 +20,7 @@ public class ProductResponse {
     private String description;
     private BigDecimal cost;
     private Category category;
+    private Integer count;
     private LocalDateTime created;
     private LocalDateTime updated;
 

@@ -3,7 +3,7 @@ package com.my.app.controller;
 import com.my.app.model.converter.FromDtoToResponseUserConverter;
 import com.my.app.model.dto.UserDto;
 import com.my.app.model.response.UserResponse;
-import com.my.app.service.UserService;
+import com.my.app.service.UserFacade;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -23,18 +23,18 @@ import static java.util.stream.Collectors.toList;
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {
-    private UserService userService;
+    private UserFacade userFacade;
     private FromDtoToResponseUserConverter userConverter;
 
     @GetMapping
     public ResponseEntity<Collection<UserResponse>> getAllUsers() {
-        final Collection<UserDto> userDtoList = userService.getAllUsers();
+        final Collection<UserDto> userDtoList = userFacade.getAllUsers();
         return ResponseEntity.ok(userDtoList.stream().map(userConverter::convert).collect(toList()));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable @NotNull @Min(1) Long id) {
-        final UserDto userDto = userService.getUserById(id);
+        final UserDto userDto = userFacade.getUserById(id);
         return ResponseEntity.ok(userConverter.convert(userDto));
     }
 }

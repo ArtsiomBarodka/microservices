@@ -9,9 +9,9 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class ProductListRequest {
+@NoArgsConstructor
+public class OrderProductListRequest {
     @NotEmpty
-    private List<@NotNull ProductRequest> products;
+    private List<@NotNull OrderProductRequest> products;
 }

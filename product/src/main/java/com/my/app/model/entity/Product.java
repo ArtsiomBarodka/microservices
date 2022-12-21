@@ -21,6 +21,7 @@ public class Product {
     private String description;
     private BigDecimal cost;
     private Category category;
+    private Integer count;
     @CreatedDate
     private LocalDateTime created;
     @LastModifiedDate

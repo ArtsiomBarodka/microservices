@@ -11,4 +11,7 @@ import org.springframework.stereotype.Component;
 public class PropertiesConfig {
     @Value("${app.service.name}")
     private String name;
+
+    @Value("${app.client.products.host}")
+    private String productsHost;
 }

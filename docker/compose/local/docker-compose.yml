@@ -1,13 +1,14 @@
-version: '3'
+version: '3.9'
 
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
+    ports:
+      - "22181:2181"
+    restart: unless-stopped
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "22181:2181"
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -15,6 +16,7 @@ services:
       - zookeeper
     ports:
       - "29092:29092"
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "nc", "-vz", "localhost", "29092"]
       interval: 5s
@@ -34,7 +36,12 @@ services:
       - mysql:/var/lib/mysql
     ports:
       - "3307:3306"
-    restart: always
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "-u$$MYSQL_USER", "-p$$MYSQL_ROOT_PASSWORD",  "ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
     environment:
       MYSQL_DATABASE: microservices
       MYSQL_USER: user
@@ -62,8 +69,6 @@ services:
     depends_on:
       mongodb:
         condition: service_healthy
-    volumes:
-      - mongodb
     ports:
       - "8881:8081"
     environment:
@@ -75,5 +80,5 @@ services:
       ME_CONFIG_BASICAUTH_PASSWORD: password
 
 volumes:
-  mysql:
-  mongodb:
+    mysql:
+    mongodb:

@@ -2,6 +2,7 @@ package com.my.app.model.dto;
 
 import com.epam.app.model.Category;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;

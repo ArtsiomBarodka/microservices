@@ -2,9 +2,10 @@ package com.my.app.config;
 
 import com.epam.app.exception.ObjectNotFoundException;
 import com.epam.app.model.Category;
-import com.my.app.model.ProductDetail;
 import com.my.app.model.entity.Product;
 import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -26,6 +27,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Slf4j
@@ -100,7 +102,7 @@ public class BatchConfig {
                 .resource(new ClassPathResource(propertiesConfig.getProductsDataPath()))
                 .targetType(ProductDetail.class)
                 .delimited()
-                .names("id","name", "description", "cost", "category", "storage", "ram", "processor", "hasBluetooth")
+                .names("id", "name", "description", "cost", "category", "count", "storage", "ram", "processor", "hasBluetooth")
                 .build();
     }
 
@@ -117,6 +119,7 @@ public class BatchConfig {
                     .description(item.getDescription())
                     .cost(item.getCost())
                     .category(category)
+                    .count(item.getCount())
                     .storage(item.getStorage())
                     .ram(item.getRam())
                     .processor(item.getProcessor())
@@ -130,5 +133,20 @@ public class BatchConfig {
         return new MongoItemWriterBuilder<Product>()
                 .template(mongoTemplate).collection(propertiesConfig.getProductsCollection())
                 .build();
+    }
+
+    @Data
+    public static class ProductDetail {
+        private String id;
+        private String name;
+        private String description;
+        private BigDecimal cost;
+        private String category;
+        private Integer count;
+
+        private String storage;
+        private String ram;
+        private String processor;
+        private Boolean hasBluetooth;
     }
 }

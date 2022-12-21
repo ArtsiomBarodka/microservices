@@ -9,8 +9,10 @@ import com.my.app.model.response.OrderItemResponse;
 import com.my.app.model.response.OrderResponse;
 import com.my.app.model.response.UserResponse;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
@@ -21,11 +23,8 @@ import static java.util.stream.Collectors.toList;
 public class FromDtoToResponseOrderConverter implements Converter<OrderDto, OrderResponse> {
 
     @Override
-    public OrderResponse convert(OrderDto source) {
-        if (source == null){
-            return null;
-        }
-
+    @NotNull
+    public OrderResponse convert(@NonNull OrderDto source) {
         List<OrderItemResponse> orderItems = source.getOrderItems()
                 .stream()
                 .map(FromDtoToResponseOrderConverter.orderItemConverter::convert)
@@ -44,10 +43,6 @@ public class FromDtoToResponseOrderConverter implements Converter<OrderDto, Orde
     }
 
     private static final Converter<OrderItemDto, OrderItemResponse> orderItemConverter = source -> {
-        if (source == null) {
-            return null;
-        }
-
         return OrderItemResponse.builder()
                 .id(source.getId())
                 .cost(source.getCost())
@@ -57,10 +52,6 @@ public class FromDtoToResponseOrderConverter implements Converter<OrderDto, Orde
     };
 
     private static final Converter<ProductDto, ProductResponse> productConverter = source -> {
-        if (source == null) {
-            return null;
-        }
-
         return ProductResponse.builder()
                 .id(source.getId())
                 .name(source.getName())
@@ -74,10 +65,6 @@ public class FromDtoToResponseOrderConverter implements Converter<OrderDto, Orde
     };
 
     private static final Converter<UserDto, UserResponse> userConverter = source -> {
-        if (source == null) {
-            return null;
-        }
-
         return UserResponse.builder()
                 .id(source.getId())
                 .email(source.getEmail())

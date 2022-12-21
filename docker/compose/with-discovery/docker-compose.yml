@@ -1,13 +1,14 @@
-version: '3'
+version: '3.9'
 
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
+    ports:
+      - "22181:2181"
+    restart: unless-stopped
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "22181:2181"
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -39,7 +40,7 @@ services:
       interval: 5s
       timeout: 10s
       retries: 5
-    restart: always
+    restart: unless-stopped
     environment:
       MYSQL_DATABASE: microservices
       MYSQL_USER: user
@@ -67,8 +68,6 @@ services:
     depends_on:
       mongodb:
         condition: service_healthy
-    volumes:
-      - mongodb
     ports:
       - "8881:8081"
     environment:
@@ -83,6 +82,7 @@ services:
     image: application/discovery-server:latest
     ports:
       - "8761:8761"
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
       interval: 30s
@@ -100,6 +100,7 @@ services:
           condition: service_healthy
     ports:
       - "8888:8888"
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
       interval: 30s
@@ -124,6 +125,7 @@ services:
         condition: service_healthy
     ports:
       - "8081:8081"
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
       interval: 30s
@@ -149,6 +151,7 @@ services:
         condition: service_healthy
     ports:
       - "8082:8082"
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
       interval: 30s
@@ -173,6 +176,7 @@ services:
         condition: service_healthy
     ports:
       - "8887:8887"
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8887/actuator/health"]
       interval: 30s

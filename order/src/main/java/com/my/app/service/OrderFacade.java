@@ -5,12 +5,13 @@ import org.springframework.lang.NonNull;
 
 import java.util.Collection;
 
-public interface OrderService {
+
+public interface OrderFacade {
     @NonNull
     OrderDto getOrderById(@NonNull Long id);
 
     @NonNull
     Collection<OrderDto> getAllOrders();
-
-    @NonNull OrderDto createOrder(@NonNull OrderDto order);
+    @NonNull
+    OrderDto createOrder(@NonNull OrderDto order);
 }
