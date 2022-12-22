@@ -121,7 +121,7 @@ services:
       KAFKA_URI: http://kafka:9092
       MYSQL_URL: mysql:3306
       PRODUCT_URI: http://product:8082
-      HAS_LOAD_BALANCER: "false"
+      SPRING_PROFILES_ACTIVE: withoutLoadBalancer
 
   product:
     image: application/product:latest
