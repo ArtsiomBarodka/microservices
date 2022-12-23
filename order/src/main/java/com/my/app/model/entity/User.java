@@ -1,13 +1,9 @@
 package com.my.app.model.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -26,6 +22,8 @@ public class User {
     @Column(name = "email", nullable = false)
     private String email;
 
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Order> orders;
+    private Set<Order> orders;
 }

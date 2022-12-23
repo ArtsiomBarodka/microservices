@@ -5,8 +5,8 @@ import com.my.app.model.converter.FromEntityToDtoProductConverter;
 import com.my.app.model.dto.ProductDto;
 import com.my.app.model.dto.UpdateOperationType;
 import com.my.app.model.entity.Product;
+import com.my.app.repository.ProductRepository;
 import com.my.app.service.ProductService;
-import com.my.app.service.repository.ProductRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -49,9 +49,15 @@ public class ProductServiceImpl implements ProductService {
     public Collection<ProductDto> getAllProductsByIds(@NonNull Collection<String> ids) {
         final Iterable<Product> productEntities = productRepository.findAllById(ids);
 
-        return StreamSupport.stream(productEntities.spliterator(), false)
+        List<ProductDto> result = StreamSupport.stream(productEntities.spliterator(), false)
                 .map(productConverter::convert)
                 .collect(toList());
+
+        if (result.size() != ids.size()) {
+            throw new ObjectNotFoundException("Some of Products are not found");
+        }
+
+        return result;
     }
 
     @Override
