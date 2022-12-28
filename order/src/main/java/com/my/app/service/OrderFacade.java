@@ -11,7 +11,8 @@ public interface OrderFacade {
     OrderDto getOrderById(@NonNull Long id);
 
     @NonNull
-    Collection<OrderDto> getAllOrders();
+    Collection<OrderDto> getAllOrdersByUserId(@NonNull Long id);
+
     @NonNull
     OrderDto createOrder(@NonNull OrderDto order);
 }

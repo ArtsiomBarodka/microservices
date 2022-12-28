@@ -1,9 +1,10 @@
 package com.my.app.service.impl;
 
 import com.epam.app.exception.ObjectNotFoundException;
+import com.epam.app.exception.ProcessException;
+import com.my.app.model.UpdateOperationType;
 import com.my.app.model.converter.FromEntityToDtoProductConverter;
 import com.my.app.model.dto.ProductDto;
-import com.my.app.model.dto.UpdateOperationType;
 import com.my.app.model.entity.Product;
 import com.my.app.repository.ProductRepository;
 import com.my.app.service.ProductService;
@@ -63,25 +64,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @NonNull
     @Transactional
-    public Collection<ProductDto> updateAllProducts(@NonNull List<ProductDto> updateProducts) {
-        return updateAllProducts(updateProducts, UpdateOperationType.UPDATE);
-    }
-
-    @Override
-    @NonNull
-    @Transactional
-    public Collection<ProductDto> addProductsCount(@NonNull List<ProductDto> updateProducts) {
-        return updateAllProducts(updateProducts, UpdateOperationType.ADD);
-    }
-
-    @Override
-    @NonNull
-    @Transactional
-    public Collection<ProductDto> subtractProductsCount(@NonNull List<ProductDto> updateProducts) {
-        return updateAllProducts(updateProducts, UpdateOperationType.SUBTRACT);
-    }
-
-    public Collection<ProductDto> updateAllProducts(@NonNull List<ProductDto> updateProducts, UpdateOperationType updateOperationType) {
+    public Collection<ProductDto> updateAllProducts(@NonNull List<ProductDto> updateProducts, @NonNull UpdateOperationType updateOperationType) {
         final Set<String> ids = updateProducts.stream().map(ProductDto::getId).collect(toSet());
         final Iterable<Product> existingProducts = productRepository.findAllById(ids);
 
@@ -99,52 +82,55 @@ public class ProductServiceImpl implements ProductService {
                 .collect(toList());
     }
 
-    private void updateProduct(Product existingProduct, ProductDto updateProduct, UpdateOperationType updateOperationType) {
-        if (updateProduct.getCount() != null) {
+    private void updateProduct(Product existingProduct, ProductDto newProductFields, UpdateOperationType updateOperationType) {
+        if (newProductFields.getCount() != null) {
             switch (updateOperationType) {
                 case ADD:
-                    existingProduct.setCount(existingProduct.getCount() + updateProduct.getCount());
+                    existingProduct.setCount(existingProduct.getCount() + newProductFields.getCount());
                     break;
 
                 case SUBTRACT:
-                    int newCount = existingProduct.getCount() - updateProduct.getCount();
+                    int newCount = existingProduct.getCount() - newProductFields.getCount();
                     if (newCount < 0) {
-                        throw new RuntimeException("new count is less than 0");
+                        throw new ProcessException("New count is less than 0");
                     }
                     existingProduct.setCount(newCount);
                     break;
 
                 case UPDATE:
-                    existingProduct.setCount(updateProduct.getCount());
+                    updateProductFields(existingProduct, newProductFields);
                     break;
             }
         }
+    }
 
-        if (UpdateOperationType.UPDATE == updateOperationType) {
-            if (updateProduct.getName() != null) {
-                existingProduct.setName(updateProduct.getName());
-            }
-            if (updateProduct.getDescription() != null) {
-                existingProduct.setDescription(updateProduct.getDescription());
-            }
-            if (updateProduct.getCost() != null) {
-                existingProduct.setCost(updateProduct.getCost());
-            }
-            if (updateProduct.getCategory() != null) {
-                existingProduct.setCategory(updateProduct.getCategory());
-            }
-            if (updateProduct.getStorage() != null) {
-                existingProduct.setStorage(updateProduct.getStorage());
-            }
-            if (updateProduct.getRam() != null) {
-                existingProduct.setRam(updateProduct.getRam());
-            }
-            if (updateProduct.getProcessor() != null) {
-                existingProduct.setProcessor(updateProduct.getProcessor());
-            }
-            if (updateProduct.getHasBluetooth() != null) {
-                existingProduct.setHasBluetooth(updateProduct.getHasBluetooth());
-            }
+    private void updateProductFields(Product existingProduct, ProductDto newProductFields) {
+        if (newProductFields.getName() != null) {
+            existingProduct.setName(newProductFields.getName());
+        }
+        if (newProductFields.getCount() != null) {
+            existingProduct.setCount(newProductFields.getCount());
+        }
+        if (newProductFields.getDescription() != null) {
+            existingProduct.setDescription(newProductFields.getDescription());
+        }
+        if (newProductFields.getCost() != null) {
+            existingProduct.setCost(newProductFields.getCost());
+        }
+        if (newProductFields.getCategory() != null) {
+            existingProduct.setCategory(newProductFields.getCategory());
+        }
+        if (newProductFields.getStorage() != null) {
+            existingProduct.setStorage(newProductFields.getStorage());
+        }
+        if (newProductFields.getRam() != null) {
+            existingProduct.setRam(newProductFields.getRam());
+        }
+        if (newProductFields.getProcessor() != null) {
+            existingProduct.setProcessor(newProductFields.getProcessor());
+        }
+        if (newProductFields.getHasBluetooth() != null) {
+            existingProduct.setHasBluetooth(newProductFields.getHasBluetooth());
         }
     }
 }

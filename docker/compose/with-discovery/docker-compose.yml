@@ -16,6 +16,7 @@ services:
       - zookeeper
     ports:
       - "29092:29092"
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "nc", "-vz", "localhost", "29092"]
       interval: 5s
@@ -29,18 +30,36 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
-  mysql:
+  mysql_order:
     image: mysql:8.0
     volumes:
-      - mysql:/var/lib/mysql
+      - mysql_order:/var/lib/mysql
     ports:
       - "3307:3306"
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "mysqladmin", "-u$$MYSQL_USER", "-p$$MYSQL_ROOT_PASSWORD",  "ping", "-h", "localhost"]
       interval: 5s
       timeout: 10s
       retries: 5
+    environment:
+      MYSQL_DATABASE: microservices
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+
+  mysql_customer:
+    image: mysql:8.0
+    volumes:
+      - mysql_customer:/var/lib/mysql
+    ports:
+      - "3308:3306"
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "-u$$MYSQL_USER", "-p$$MYSQL_ROOT_PASSWORD",  "ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
     environment:
       MYSQL_DATABASE: microservices
       MYSQL_USER: user
@@ -121,7 +140,7 @@ services:
         condition: service_healthy
       kafka:
         condition: service_healthy
-      mysql:
+      mysql_order:
         condition: service_healthy
     ports:
       - "8081:8081"
@@ -136,7 +155,33 @@ services:
       EUREKA_URI: http://discovery-server:8761/eureka/
       CONFIG_URI: http://config-server:8888/
       KAFKA_URI: http://kafka:9092
-      MYSQL_URL: mysql:3306
+      MYSQL_URL: mysql_order:3306
+
+  customer:
+    image: application/customer:latest
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      mysql_customer:
+        condition: service_healthy
+    ports:
+      - "8083:8083"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8083/actuator/health" ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    environment:
+      SERVER_PORT: 8083
+      EUREKA_URI: http://discovery-server:8761/eureka/
+      CONFIG_URI: http://config-server:8888/
+      KAFKA_URI: http://kafka:9092
+      MYSQL_URL: mysql_customer:3306
 
   product:
     image: application/product:latest
@@ -189,5 +234,6 @@ services:
       KAFKA_URI: http://kafka:9092
 
 volumes:
-  mysql:
+  mysql_order:
+  mysql_customer:
   mongodb:

@@ -1,4 +1,4 @@
-package com.epam.app.model;
+package com.epam.app.model.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

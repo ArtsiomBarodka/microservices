@@ -8,7 +8,6 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -26,23 +25,10 @@ public class Order {
     @CreationTimestamp
     private LocalDateTime created;
 
-    @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "fk_user_id", nullable = false)
-    private User user;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "fk_order_id", nullable = false)
     private List<OrderItem> orderItems;
-
-    public void addOrderItems(List<OrderItem> orderItems) {
-        if (orderItems == null) {
-            return;
-        }
-
-        if (this.orderItems == null) {
-            this.orderItems = new ArrayList<>();
-        }
-
-        this.orderItems.addAll(orderItems);
-        orderItems.forEach(orderItem -> orderItem.setOrder(this));
-    }
 }

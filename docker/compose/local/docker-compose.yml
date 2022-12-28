@@ -30,12 +30,30 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
-  mysql:
+  mysql_order:
     image: mysql:8.0
     volumes:
-      - mysql:/var/lib/mysql
+      - mysql_order:/var/lib/mysql
     ports:
       - "3307:3306"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "-u$$MYSQL_USER", "-p$$MYSQL_ROOT_PASSWORD",  "ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    environment:
+      MYSQL_DATABASE: microservices
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+
+  mysql_customer:
+    image: mysql:8.0
+    volumes:
+      - mysql_customer:/var/lib/mysql
+    ports:
+      - "3308:3306"
     restart: unless-stopped
     healthcheck:
       test: [ "CMD", "mysqladmin", "-u$$MYSQL_USER", "-p$$MYSQL_ROOT_PASSWORD",  "ping", "-h", "localhost" ]
@@ -80,5 +98,6 @@ services:
       ME_CONFIG_BASICAUTH_PASSWORD: password
 
 volumes:
-    mysql:
+    mysql_order:
+    mysql_customer:
     mongodb:

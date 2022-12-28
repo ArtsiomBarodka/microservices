@@ -1,4 +1,4 @@
-package com.my.app.model.dto;
+package com.my.app.model;
 
 public enum UpdateOperationType {
     ADD,

@@ -1,11 +1,12 @@
 package com.my.app.client;
 
-import com.epam.app.model.OrderProductListRequest;
-import com.epam.app.model.ProductListRequest;
-import com.epam.app.model.ProductResponse;
+import com.epam.app.model.request.ProductListRequest;
+import com.epam.app.model.request.UpdateProductListRequest;
+import com.epam.app.model.response.ProductResponse;
 import com.my.app.config.PropertiesConfig;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -13,14 +14,14 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Component
-public class ProductWebClient {
+public class ProductWebClient implements ProductClient {
     private final PropertiesConfig propertiesConfig;
     private final WebClient webClient;
 
-    public List<ProductResponse> getAllProductsByIds(ProductListRequest productListRequest) {
+    public List<ProductResponse> getAllProductsByIds(@NonNull ProductListRequest productListRequest) {
         return webClient
                 .post()
-                .uri(propertiesConfig.getProductsHost() + "/api/v1/products")
+                .uri(propertiesConfig.getProductsHost() + "/api/v1/products/all")
                 .bodyValue(productListRequest)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<List<ProductResponse>>() {
@@ -28,11 +29,12 @@ public class ProductWebClient {
                 .block();
     }
 
-    public List<ProductResponse> buyProducts(OrderProductListRequest orderProductListRequest) {
+
+    public List<ProductResponse> subtractProductsCount(@NonNull UpdateProductListRequest updateProductListRequest) {
         return webClient
                 .patch()
                 .uri(propertiesConfig.getProductsHost() + "/api/v1/products")
-                .bodyValue(orderProductListRequest)
+                .bodyValue(updateProductListRequest)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<List<ProductResponse>>() {
                 })

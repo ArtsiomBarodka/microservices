@@ -1,0 +1,3 @@
+ INSERT INTO `microservices`.`customer` (name, email, fund, updated, created) VALUES ('Mike','mike123@gmail.com', 10000.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+ INSERT INTO `microservices`.`customer` (name, email, fund, updated, created) VALUES ('John','john1@gmail.com', 5000.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+ INSERT INTO `microservices`.`customer` (name, email, fund, updated, created) VALUES ('Diane','diane999@gmail.com', 500.50, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);

@@ -10,7 +10,9 @@ public interface OrderService {
     OrderDto getOrderById(@NonNull Long id);
 
     @NonNull
-    Collection<OrderDto> getAllOrders();
+    Collection<OrderDto> getAllOrdersByUserId(@NonNull Long id);
 
     @NonNull OrderDto createOrder(@NonNull OrderDto order);
+
+    @NonNull OrderDto updateOrder(@NonNull OrderDto order);
 }

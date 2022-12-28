@@ -1,6 +1,6 @@
 package com.my.app.model.converter;
 
-import com.epam.app.model.ProductResponse;
+import com.epam.app.model.response.ProductResponse;
 import com.my.app.model.dto.ProductDto;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;

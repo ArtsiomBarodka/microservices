@@ -2,10 +2,10 @@ package com.my.app.model.converter;
 
 import com.my.app.model.dto.OrderDto;
 import com.my.app.model.dto.OrderItemDto;
+import com.my.app.model.dto.ProductDto;
 import com.my.app.model.dto.UserDto;
 import com.my.app.model.entity.Order;
 import com.my.app.model.entity.OrderItem;
-import com.my.app.model.entity.User;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -24,24 +24,16 @@ public class FromEntityToDtoOrderConverter implements Converter<Order, OrderDto>
                         .stream()
                         .map(FromEntityToDtoOrderConverter.orderItemConverter::convert)
                         .collect(toList()))
-                .user(FromEntityToDtoOrderConverter.userConverter.convert(source.getUser()))
+                .user(new UserDto(source.getUserId()))
                 .build();
     }
 
     private static final Converter<OrderItem, OrderItemDto> orderItemConverter = source -> {
         return OrderItemDto.builder()
                 .id(source.getId())
-                .productId(source.getProduct().getProductId())
+                .product(new ProductDto(source.getProductId()))
                 .cost(source.getCost())
                 .count(source.getCount())
-                .build();
-    };
-
-    private static final Converter<User, UserDto> userConverter = source -> {
-        return UserDto.builder()
-                .id(source.getId())
-                .email(source.getEmail())
-                .name(source.getName())
                 .build();
     };
 }

@@ -5,7 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.math.BigDecimal;
 
 @Data
@@ -19,15 +24,10 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "fk_product_id", nullable = false)
-    private ProductId product;
+    @Column(name = "product_id", nullable = false)
+    private String productId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "fk_order_id", nullable = false)
-    private Order order;
-
-    @Column(name = "cost", nullable = false)
+    @Column(name = "cost", scale = 2)
     private BigDecimal cost;
 
     @Column(name = "count", nullable = false)

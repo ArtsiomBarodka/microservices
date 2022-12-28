@@ -14,4 +14,7 @@ public class PropertiesConfig {
 
     @Value("${app.client.products.host}")
     private String productsHost;
+
+    @Value("${app.client.customers.host}")
+    private String customersHost;
 }

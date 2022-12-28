@@ -38,8 +38,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     @NonNull
-    public Collection<OrderDto> getAllOrders() {
-        final List<Order> orderEntities = orderRepository.findAll();
+    public Collection<OrderDto> getAllOrdersByUserId(@NonNull Long id) {
+        final List<Order> orderEntities = orderRepository.findByUserId(id);
+        if(orderEntities.isEmpty()) {
+            throw new ObjectNotFoundException("Orders are not found");
+        }
 
         return orderEntities.stream()
                 .map(toDtoOrderConverter::convert)
@@ -53,5 +56,19 @@ public class OrderServiceImpl implements OrderService {
         final Order orderEntity = toEntityOrderConverter.convert(order);
         final Order savedOrderEntity = orderRepository.save(orderEntity);
         return toDtoOrderConverter.convert(savedOrderEntity);
+    }
+
+    @Override
+    @Transactional
+    @NonNull
+    public OrderDto updateOrder(@NonNull OrderDto order) {
+        boolean isOrderExist = orderRepository.existsById(order.getId());
+        if (!isOrderExist) {
+            throw new ObjectNotFoundException("Order is not found");
+        }
+
+        final Order orderEntity = toEntityOrderConverter.convert(order);
+        final Order updatedOrderEntity = orderRepository.save(orderEntity);
+        return toDtoOrderConverter.convert(updatedOrderEntity);
     }
 }

@@ -32,6 +32,7 @@ unpack config-server config-server
 unpack discovery-server discovery-server
 unpack product product
 unpack order order
+unpack customer customer
 unpack api-gateway api-gateway
 
 echo "Building Docker image"
@@ -39,4 +40,5 @@ build config-server application/config-server
 build discovery-server application/discovery-server
 build product application/product
 build order application/order
+build customer application/customer
 build api-gateway application/api-gateway

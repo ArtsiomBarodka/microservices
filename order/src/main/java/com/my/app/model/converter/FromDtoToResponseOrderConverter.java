@@ -1,6 +1,6 @@
 package com.my.app.model.converter;
 
-import com.epam.app.model.ProductResponse;
+import com.epam.app.model.response.ProductResponse;
 import com.my.app.model.dto.OrderDto;
 import com.my.app.model.dto.OrderItemDto;
 import com.my.app.model.dto.ProductDto;
@@ -21,7 +21,6 @@ import static java.util.stream.Collectors.toList;
 
 @Component
 public class FromDtoToResponseOrderConverter implements Converter<OrderDto, OrderResponse> {
-
     @Override
     @NotNull
     public OrderResponse convert(@NonNull OrderDto source) {

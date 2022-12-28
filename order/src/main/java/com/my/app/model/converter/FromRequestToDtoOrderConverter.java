@@ -18,23 +18,17 @@ public class FromRequestToDtoOrderConverter implements Converter<OrderRequest, O
     @NonNull
     public OrderDto convert(@NonNull OrderRequest source) {
         return OrderDto.builder()
-                .user(convertToUserDto(source))
+                .user(new UserDto(source.getUserId()))
                 .orderItems(convertToOrderItemDto(source))
                 .build();
     }
 
-    private UserDto convertToUserDto(OrderRequest source) {
-        return UserDto.builder()
-                .id(source.getUserId())
-                .build();
-    }
-
     private List<OrderItemDto> convertToOrderItemDto(OrderRequest source) {
-        return source.getItems().stream().map(productRequest -> {
-            return OrderItemDto.builder()
-                    .productId(productRequest.getProductId())
-                    .count(productRequest.getCount())
-                    .build();
-        }).collect(Collectors.toList());
+        return source.getItems().stream()
+                .map(productRequest -> OrderItemDto.builder()
+                        .product(new ProductDto(productRequest.getProductId()))
+                        .count(productRequest.getCount())
+                        .build())
+                .collect(Collectors.toList());
     }
 }

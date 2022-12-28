@@ -1,4 +1,4 @@
-package com.epam.app.model;
+package com.epam.app.model.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,9 +9,9 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class ProductListRequest {
+@NoArgsConstructor
+public class UpdateProductListRequest {
     @NotEmpty
-    private List<@NotNull ProductRequest> products;
+    private List<@NotNull UpdateProductRequest> products;
 }

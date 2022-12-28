@@ -2,13 +2,8 @@ package com.my.app.model.dto;
 
 import com.epam.app.model.Category;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -23,4 +18,8 @@ public class ProductDto {
     private String ram;
     private String processor;
     private Boolean hasBluetooth;
+
+    public ProductDto (String id) {
+        this.id = id;
+    }
 }

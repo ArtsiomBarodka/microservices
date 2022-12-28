@@ -6,4 +6,5 @@ include 'config-server'
 include 'discovery-server'
 include 'common'
 include 'api-gateway'
+include 'customer'
 
