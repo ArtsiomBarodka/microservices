@@ -1,5 +1,6 @@
 package com.my.app.model.response;
 
+import com.epam.app.model.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,8 @@ public class OrderResponse {
 
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime created;
+
+    private OrderStatus orderStatus;
 
     private BigDecimal totalCost;
 

@@ -32,6 +32,7 @@ public class FromDtoToResponseOrderConverter implements Converter<OrderDto, Orde
         return OrderResponse.builder()
                 .id(source.getId())
                 .created(source.getCreated())
+                .orderStatus(source.getStatus())
                 .totalCost(orderItems.stream()
                         .filter(Objects::nonNull)
                         .map(OrderItemResponse::getCost)

@@ -27,6 +27,7 @@ public class FromDtoToEntityOrderConverter implements Converter<OrderDto, Order>
 
         return Order.builder()
                 .userId(source.getUser().getId())
+                .status(source.getStatus())
                 .orderItems(orderItems)
                 .build();
     }

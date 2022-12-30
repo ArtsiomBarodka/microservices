@@ -5,7 +5,6 @@ import com.epam.app.model.Category;
 import com.my.app.model.entity.Product;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;

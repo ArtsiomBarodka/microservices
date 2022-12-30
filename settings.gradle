@@ -7,4 +7,5 @@ include 'discovery-server'
 include 'common'
 include 'api-gateway'
 include 'customer'
+include 'order-orchestrator'
 

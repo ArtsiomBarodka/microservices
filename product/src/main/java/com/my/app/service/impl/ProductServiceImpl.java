@@ -9,30 +9,41 @@ import com.my.app.model.entity.Product;
 import com.my.app.repository.ProductRepository;
 import com.my.app.service.ProductService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
-    private final FromEntityToDtoProductConverter productConverter;
+    private final FromEntityToDtoProductConverter toDtoProductConverter;
 
     @Override
     @NonNull
-    public ProductDto getProductById(@NonNull Long id) {
-        final Product productEntity = productRepository.findById(id.toString()).orElseThrow(() -> new ObjectNotFoundException("Product is not found"));
+    public ProductDto getProductById(@NonNull String id) {
+        final Product productEntity = productRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Product with (id = {}) is not found", id);
+                    return new ObjectNotFoundException(String.format("Product with (id = %s) is not found", id));
+                });
 
-        return productConverter.convert(productEntity);
+        log.info("Product with (id = {}) is fetched. Product: {}", id, productEntity);
+
+        return toDtoProductConverter.convert(productEntity);
     }
 
     @Override
@@ -40,8 +51,15 @@ public class ProductServiceImpl implements ProductService {
     public Collection<ProductDto> getAllProducts() {
         final Collection<Product> productEntities = productRepository.findAll();
 
+        if (productEntities.isEmpty()) {
+            log.warn("Products are not found");
+            throw new ObjectNotFoundException("Products are not found");
+        }
+
+        log.info("All Products are fetched. Products: {}", productEntities);
+
         return productEntities.stream()
-                .map(productConverter::convert)
+                .map(toDtoProductConverter::convert)
                 .collect(toList());
     }
 
@@ -51,12 +69,26 @@ public class ProductServiceImpl implements ProductService {
         final Iterable<Product> productEntities = productRepository.findAllById(ids);
 
         List<ProductDto> result = StreamSupport.stream(productEntities.spliterator(), false)
-                .map(productConverter::convert)
+                .map(toDtoProductConverter::convert)
                 .collect(toList());
 
-        if (result.size() != ids.size()) {
-            throw new ObjectNotFoundException("Some of Products are not found");
+        if (result.isEmpty()) {
+            log.warn("Products with (ids = {}) are not found", ids);
+            throw new ObjectNotFoundException(String.format("Products with (userId = %s) are not found", String.join(", ", ids)));
         }
+
+        if (result.size() != ids.size()) {
+            final String notFoundIdsRow = ids.stream()
+                    .filter(id -> result.stream()
+                            .map(ProductDto::getId)
+                            .noneMatch(id::equals))
+                    .collect(Collectors.joining(";"));
+
+            log.warn("Products with (ids = {}) are not found", notFoundIdsRow);
+            throw new ObjectNotFoundException(String.format("Products with (userId = %s) are not found", notFoundIdsRow));
+        }
+
+        log.info("Products with (ids = {}) are fetched. Products: {}", ids, productEntities);
 
         return result;
     }
@@ -64,21 +96,33 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @NonNull
     @Transactional
-    public Collection<ProductDto> updateAllProducts(@NonNull List<ProductDto> updateProducts, @NonNull UpdateOperationType updateOperationType) {
-        final Set<String> ids = updateProducts.stream().map(ProductDto::getId).collect(toSet());
+    public Collection<ProductDto> updateAllProducts(@NonNull List<ProductDto> newProductsFields, @NonNull UpdateOperationType updateOperationType) {
+        final Set<String> ids = newProductsFields.stream().map(ProductDto::getId).collect(toSet());
         final Iterable<Product> existingProducts = productRepository.findAllById(ids);
 
+        final List<String> notFoundIds = new ArrayList<>(newProductsFields.size());
 
-        for (Product existingProduct : existingProducts) {
-            updateProducts.stream()
-                    .filter(updateProduct -> existingProduct.getId().equals(updateProduct.getId()))
-                    .findFirst()
-                    .ifPresent(product -> updateProduct(existingProduct, product, updateOperationType));
+        for (ProductDto newProductFields : newProductsFields) {
+            final Optional<Product> candidateForUpdate = StreamSupport.stream(existingProducts.spliterator(), false)
+                    .filter(existingProduct -> existingProduct.getId().equals(newProductFields.getId()))
+                    .findFirst();
+
+            if (candidateForUpdate.isPresent()) {
+                updateProduct(candidateForUpdate.get(), newProductFields, updateOperationType);
+            } else {
+                notFoundIds.add(newProductFields.getId());
+            }
         }
 
-        final List<Product> newProducts = productRepository.saveAll(existingProducts);
-        return newProducts.stream()
-                .map(productConverter::convert)
+        if (!notFoundIds.isEmpty()) {
+            log.warn("Products with (ids = {}) are not found", notFoundIds);
+            throw new ObjectNotFoundException(String.format("Products with (ids = %s) are not found", String.join(", ", notFoundIds)));
+        }
+
+        log.info("Products with (ids = {}) are updated. Updated products: {}", ids, existingProducts);
+
+        return StreamSupport.stream(existingProducts.spliterator(), false)
+                .map(toDtoProductConverter::convert)
                 .collect(toList());
     }
 
@@ -92,7 +136,12 @@ public class ProductServiceImpl implements ProductService {
                 case SUBTRACT:
                     int newCount = existingProduct.getCount() - newProductFields.getCount();
                     if (newCount < 0) {
-                        throw new ProcessException("New count is less than 0");
+                        log.warn("Product count can't be less than 0. New count = {}, Product id = {} Product count = {}",
+                                newCount, existingProduct.getId(), existingProduct.getCount());
+
+                        throw new ProcessException(String.format(
+                                "Product count can't be less than 0. New count = %d, Product id = %s Product count = %d",
+                                newCount, existingProduct.getId(), existingProduct.getCount()));
                     }
                     existingProduct.setCount(newCount);
                     break;

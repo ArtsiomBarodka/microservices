@@ -17,4 +17,10 @@ public class PropertiesConfig {
 
     @Value("${app.client.customers.host}")
     private String customersHost;
+
+    @Value("${kafka.orderOrchestrator.bootstrapAddress}")
+    private String kafkaServer;
+
+    @Value("${kafka.orderOrchestrator.topic.newOrder.name}")
+    private String kafkaTopicNewOrderName;
 }

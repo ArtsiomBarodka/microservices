@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ProductService {
     @NonNull
-    ProductDto getProductById(@NonNull Long id);
+    ProductDto getProductById(@NonNull String id);
 
     @NonNull
     Collection<ProductDto> getAllProducts();

@@ -13,7 +13,6 @@ public interface CustomerService {
     @NonNull
     Collection<CustomerDto> getAllCustomers();
 
-
     @NonNull
     CustomerDto updateCustomer(@NonNull CustomerDto customerDto, @NonNull UpdateOption updateOption);
 }

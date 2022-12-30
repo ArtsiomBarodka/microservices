@@ -20,6 +20,7 @@ public class FromEntityToDtoOrderConverter implements Converter<Order, OrderDto>
         return OrderDto.builder()
                 .id(source.getId())
                 .created(source.getCreated())
+                .status(source.getStatus())
                 .orderItems(source.getOrderItems()
                         .stream()
                         .map(FromEntityToDtoOrderConverter.orderItemConverter::convert)

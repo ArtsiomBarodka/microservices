@@ -9,6 +9,7 @@ import com.my.app.model.entity.Customer;
 import com.my.app.repository.CustomerRepository;
 import com.my.app.service.CustomerService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -19,30 +20,42 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
-    private final FromEntityToDtoCustomerConverter fromEntityToDtoCustomerConverter;
+    private final FromEntityToDtoCustomerConverter toDtoCustomerConverter;
 
     @Override
     @NonNull
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public CustomerDto getCustomerById(@NonNull Long id) {
-        Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Customer is not found"));
+        final Customer customer = customerRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Customer with (id = {}) is not found", id);
+                    return new ObjectNotFoundException(String.format("Customer with (id = %d) is not found", id));
+                });
+        log.info("Customer with (id = {}) is fetched. Customer: {}", id, customer);
 
-        return fromEntityToDtoCustomerConverter.convert(customer);
+        return toDtoCustomerConverter.convert(customer);
     }
 
     @Override
     @NonNull
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public Collection<CustomerDto> getAllCustomers() {
-        List<Customer> customers = customerRepository.findAll();
+        final List<Customer> customers = customerRepository.findAll();
+
+        if (customers.isEmpty()) {
+            log.warn("Customers are not found");
+            throw new ObjectNotFoundException("Customers are not found");
+        }
+
+        log.info("All Customers are fetched. Customers: {}", customers);
 
         return customers.stream()
-                .map(fromEntityToDtoCustomerConverter::convert)
+                .map(toDtoCustomerConverter::convert)
                 .collect(Collectors.toList());
     }
 
@@ -50,9 +63,12 @@ public class CustomerServiceImpl implements CustomerService {
     @NonNull
     @Transactional
     public CustomerDto updateCustomer(@NonNull CustomerDto customerDto, @NonNull UpdateOption updateOption) {
-        Long id = customerDto.getId();
-        Customer existingCustomer = customerRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Customer is not found"));
+        final Long id = customerDto.getId();
+        final Customer existingCustomer = customerRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Customer with (id = {}) is not found", id);
+                    return new ObjectNotFoundException(String.format("Customer with (id = %d) is not found", id));
+                });
 
         switch (updateOption) {
             case ADD_FUND:
@@ -60,9 +76,14 @@ public class CustomerServiceImpl implements CustomerService {
                 break;
 
             case SUBTRACT_FUND:
-                BigDecimal updatedFund = existingCustomer.getFund().subtract(customerDto.getFund());
+                final BigDecimal updatedFund = existingCustomer.getFund().subtract(customerDto.getFund());
                 if (updatedFund.compareTo(BigDecimal.ZERO) < 0) {
-                    throw new ProcessException("");
+                    log.warn("Customer funds after operation can't be less than 0. New funds = {}, Customer id = {} Customer funds = {}",
+                            updatedFund, existingCustomer.getId(), existingCustomer.getFund());
+
+                    throw new ProcessException(String.format(
+                            "Customer funds after operation can't be less than 0. New funds = %s, Customer id = %d Customer funds = %s",
+                            updatedFund, existingCustomer.getId(), existingCustomer.getFund()));
                 }
                 existingCustomer.setFund(updatedFund);
                 break;
@@ -72,7 +93,9 @@ public class CustomerServiceImpl implements CustomerService {
                 break;
         }
 
-        return fromEntityToDtoCustomerConverter.convert(existingCustomer);
+        log.info("Customer with (id = {}) is updated. Updated Customer: {}", id, existingCustomer);
+
+        return toDtoCustomerConverter.convert(existingCustomer);
     }
 
     private void populateCustomerFields(Customer customer, CustomerDto updatingFields) {

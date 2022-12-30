@@ -1,5 +1,6 @@
 package com.my.app.model.dto;
 
+import com.epam.app.model.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +17,8 @@ public class OrderDto {
     private Long id;
 
     private LocalDateTime created;
+
+    private OrderStatus status;
 
     private UserDto user;
 

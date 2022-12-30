@@ -1,5 +1,6 @@
 package com.my.app.model.entity;
 
+import com.epam.app.model.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,6 +28,10 @@ public class Order {
 
     @Column(name = "user_id", nullable = false)
     private Long userId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private OrderStatus status;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "fk_order_id", nullable = false)

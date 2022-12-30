@@ -1,0 +1,19 @@
+dependencies {
+    implementation project(':common')
+
+    implementation('org.springframework.cloud:spring-cloud-config-client')
+    implementation('org.springframework.cloud:spring-cloud-starter-loadbalancer')
+    implementation('org.springframework.cloud:spring-cloud-starter-bus-kafka')
+    implementation('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
+    implementation('org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j')
+
+    implementation('org.springframework.boot:spring-boot-starter-webflux')
+
+    implementation('org.springframework.kafka:spring-kafka')
+
+    implementation("org.modelmapper:modelmapper:${modelmapperVersion}")
+}
+
+bootJar {
+    enabled = true
+}
