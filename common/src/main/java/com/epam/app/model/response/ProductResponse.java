@@ -1,6 +1,7 @@
 package com.epam.app.model.response;
 
 import com.epam.app.model.Category;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,7 +23,11 @@ public class ProductResponse {
     private BigDecimal cost;
     private Category category;
     private Integer count;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime created;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updated;
 
     private String storage;

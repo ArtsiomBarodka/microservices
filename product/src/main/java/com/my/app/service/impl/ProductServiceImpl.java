@@ -12,7 +12,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -95,7 +94,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @NonNull
-    @Transactional
     public Collection<ProductDto> updateAllProducts(@NonNull List<ProductDto> newProductsFields, @NonNull UpdateOperationType updateOperationType) {
         final Set<String> ids = newProductsFields.stream().map(ProductDto::getId).collect(toSet());
         final Iterable<Product> existingProducts = productRepository.findAllById(ids);
@@ -119,9 +117,10 @@ public class ProductServiceImpl implements ProductService {
             throw new ObjectNotFoundException(String.format("Products with (ids = %s) are not found", String.join(", ", notFoundIds)));
         }
 
-        log.info("Products with (ids = {}) are updated. Updated products: {}", ids, existingProducts);
+        final List<Product> updatedProducts = productRepository.saveAll(existingProducts);
+        log.info("Products with (ids = {}) are updated. Updated products: {}", ids, updatedProducts);
 
-        return StreamSupport.stream(existingProducts.spliterator(), false)
+        return updatedProducts.stream()
                 .map(toDtoProductConverter::convert)
                 .collect(toList());
     }

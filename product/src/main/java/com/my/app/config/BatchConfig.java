@@ -27,6 +27,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -123,6 +124,7 @@ public class BatchConfig {
                     .ram(item.getRam())
                     .processor(item.getProcessor())
                     .hasBluetooth(item.getHasBluetooth())
+                    .created(LocalDateTime.now())
                     .build();
         };
     }

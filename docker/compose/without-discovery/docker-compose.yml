@@ -115,6 +115,31 @@ services:
       GIT_TOKEN: ${GIT_TOKEN}
       KAFKA_URI: http://kafka:9092
 
+  order-orchestrator:
+    image: application/order-orchestrator:latest
+    depends_on:
+      config-server:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    ports:
+      - "8084:8084"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8084/actuator/health" ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    environment:
+      SERVER_PORT: 8084
+      EUREKA_CLIENT_ENABLED: "false"
+      CONFIG_URI: http://config-server:8888/
+      KAFKA_URI: http://kafka:9092
+      ORDER_URI: http://order:8081
+      PRODUCT_URI: http://product:8082
+      CUSTOMER_URI: http://customer:8083
+      SPRING_PROFILES_ACTIVE: withoutLoadBalancer
+
   order:
     image: application/order:latest
     depends_on:
@@ -123,6 +148,8 @@ services:
       kafka:
         condition: service_healthy
       mysql_order:
+        condition: service_healthy
+      order-orchestrator:
         condition: service_healthy
     ports:
       - "8081:8081"
@@ -197,6 +224,12 @@ services:
       config-server:
         condition: service_healthy
       kafka:
+        condition: service_healthy
+      order:
+        condition: service_healthy
+      customer:
+        condition: service_healthy
+      product:
         condition: service_healthy
     ports:
       - "8887:8887"
