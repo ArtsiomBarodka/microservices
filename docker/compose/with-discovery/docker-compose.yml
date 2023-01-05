@@ -97,6 +97,11 @@ services:
       ME_CONFIG_BASICAUTH_USERNAME: admin
       ME_CONFIG_BASICAUTH_PASSWORD: password
 
+  zipkin:
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+
   discovery-server:
     image: application/discovery-server:latest
     ports:
@@ -153,6 +158,7 @@ services:
       EUREKA_URI: http://discovery-server:8761/eureka/
       CONFIG_URI: http://config-server:8888/
       KAFKA_URI: http://kafka:9092
+      ZIPKIN_URI: http://zipkin:9411/
 
   order:
     image: application/order:latest
@@ -181,6 +187,7 @@ services:
       CONFIG_URI: http://config-server:8888/
       KAFKA_URI: http://kafka:9092
       MYSQL_URL: mysql_order:3306
+      ZIPKIN_URI: http://zipkin:9411/
 
   customer:
     image: application/customer:latest
@@ -207,6 +214,7 @@ services:
       CONFIG_URI: http://config-server:8888/
       KAFKA_URI: http://kafka:9092
       MYSQL_URL: mysql_customer:3306
+      ZIPKIN_URI: http://zipkin:9411/
 
   product:
     image: application/product:latest
@@ -232,6 +240,7 @@ services:
       EUREKA_URI: http://discovery-server:8761/eureka/
       CONFIG_URI: http://config-server:8888/
       KAFKA_URI: http://kafka:9092
+      ZIPKIN_URI: http://zipkin:9411/
       MONGO_DB_HOST: mongodb
       MONGO_DB_PORT: 27017
 
@@ -263,6 +272,7 @@ services:
       EUREKA_URI: http://discovery-server:8761/eureka/
       CONFIG_URI: http://config-server:8888/
       KAFKA_URI: http://kafka:9092
+      ZIPKIN_URI: http://zipkin:9411/
 
 volumes:
   mysql_order:

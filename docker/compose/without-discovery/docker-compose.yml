@@ -96,6 +96,11 @@ services:
       ME_CONFIG_BASICAUTH_USERNAME: admin
       ME_CONFIG_BASICAUTH_PASSWORD: password
 
+  zipkin:
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+
   config-server:
     image: application/config-server:latest
     depends_on:
@@ -138,6 +143,7 @@ services:
       ORDER_URI: http://order:8081
       PRODUCT_URI: http://product:8082
       CUSTOMER_URI: http://customer:8083
+      ZIPKIN_URI: http://zipkin:9411/
       SPRING_PROFILES_ACTIVE: withoutLoadBalancer
 
   order:
@@ -167,6 +173,7 @@ services:
       MYSQL_URL: mysql_order:3306
       PRODUCT_URI: http://product:8082
       CUSTOMER_URI: http://customer:8083
+      ZIPKIN_URI: http://zipkin:9411/
       SPRING_PROFILES_ACTIVE: withoutLoadBalancer
 
   product:
@@ -191,6 +198,7 @@ services:
       EUREKA_CLIENT_ENABLED: "false"
       CONFIG_URI: http://config-server:8888/
       KAFKA_URI: http://kafka:9092
+      ZIPKIN_URI: http://zipkin:9411/
       MONGO_DB_HOST: mongodb
       MONGO_DB_PORT: 27017
 
@@ -217,6 +225,7 @@ services:
       CONFIG_URI: http://config-server:8888/
       KAFKA_URI: http://kafka:9092
       MYSQL_URL: mysql_customer:3306
+      ZIPKIN_URI: http://zipkin:9411/
 
   api-gateway:
     image: application/api-gateway:latest
@@ -247,6 +256,7 @@ services:
       ORDER_URI: http://order:8081
       PRODUCT_URI: http://product:8082
       CUSTOMER_URI: http://customer:8083
+      ZIPKIN_URI: http://zipkin:9411/
 
 volumes:
   mysql_order:
