@@ -89,6 +89,7 @@ services:
         condition: service_healthy
     ports:
       - "8881:8081"
+    restart: unless-stopped
     environment:
       ME_CONFIG_MONGODB_SERVER: mongodb
       ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
@@ -101,6 +102,7 @@ services:
     image: openzipkin/zipkin
     ports:
       - "9411:9411"
+    restart: unless-stopped
 
 volumes:
     mysql_order:

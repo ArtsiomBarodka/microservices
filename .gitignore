@@ -1,8 +1,14 @@
+# gradle files
 .gradle
 gradle
 gradlew
 gradlew.bat
 
+# build output files
 build
 
+# idea files
 .idea
+
+# log files
+*.log*
