@@ -101,8 +101,62 @@ services:
     ports:
       - "9411:9411"
 
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.2.0
+    restart: unless-stopped
+    volumes:
+      - "../../../elk/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro"
+      - shared_logs_volume:/usr/logs
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.2.0
+    volumes:
+      - elastic-data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl --fail http://localhost:9200 || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.2.0
+    restart: unless-stopped
+    ports:
+      - "5601:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl --fail http://localhost:5601 || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+
   config-server:
     image: application/config-server:latest
+    volumes:
+      - shared_logs_volume:/opt/logs
     depends_on:
       kafka:
           condition: service_healthy
@@ -119,9 +173,12 @@ services:
       EUREKA_CLIENT_ENABLED: "false"
       GIT_TOKEN: ${GIT_TOKEN}
       KAFKA_URI: http://kafka:9092
+      LOGGING_FILE_NAME: logs/config-server/config-server.log
 
   order-orchestrator:
     image: application/order-orchestrator:latest
+    volumes:
+      - shared_logs_volume:/opt/logs
     depends_on:
       config-server:
         condition: service_healthy
@@ -145,9 +202,12 @@ services:
       CUSTOMER_URI: http://customer:8083
       ZIPKIN_URI: http://zipkin:9411/
       SPRING_PROFILES_ACTIVE: withoutLoadBalancer
+      LOGGING_FILE_NAME: logs/order-orchestrator/order-orchestrator.log
 
   order:
     image: application/order:latest
+    volumes:
+      - shared_logs_volume:/opt/logs
     depends_on:
       config-server:
         condition: service_healthy
@@ -175,9 +235,12 @@ services:
       CUSTOMER_URI: http://customer:8083
       ZIPKIN_URI: http://zipkin:9411/
       SPRING_PROFILES_ACTIVE: withoutLoadBalancer
+      LOGGING_FILE_NAME: logs/order/order.log
 
   product:
     image: application/product:latest
+    volumes:
+      - shared_logs_volume:/opt/logs
     depends_on:
       config-server:
         condition: service_healthy
@@ -201,9 +264,12 @@ services:
       ZIPKIN_URI: http://zipkin:9411/
       MONGO_DB_HOST: mongodb
       MONGO_DB_PORT: 27017
+      LOGGING_FILE_NAME: logs/product/product.log
 
   customer:
     image: application/customer:latest
+    volumes:
+      - shared_logs_volume:/opt/logs
     depends_on:
       config-server:
         condition: service_healthy
@@ -226,9 +292,12 @@ services:
       KAFKA_URI: http://kafka:9092
       MYSQL_URL: mysql_customer:3306
       ZIPKIN_URI: http://zipkin:9411/
+      LOGGING_FILE_NAME: logs/customer/customer.log
 
   api-gateway:
     image: application/api-gateway:latest
+    volumes:
+      - shared_logs_volume:/opt/logs
     depends_on:
       config-server:
         condition: service_healthy
@@ -257,8 +326,11 @@ services:
       PRODUCT_URI: http://product:8082
       CUSTOMER_URI: http://customer:8083
       ZIPKIN_URI: http://zipkin:9411/
+      LOGGING_FILE_NAME: logs/api-gateway/api-gateway.log
 
 volumes:
   mysql_order:
   mysql_customer:
   mongodb:
+  elastic-data:
+  shared_logs_volume:
