@@ -23,11 +23,10 @@ public class UserServiceImpl implements UserService {
     public UserDto getUserById(@NonNull Long userId) {
         log.info("Fetching user with (id = {})", userId);
 
-        CustomerResponse customerResponse = customerClient.getCustomerById(userId);
-        if (customerResponse == null) {
+        final CustomerResponse customerResponse = customerClient.getCustomerById(userId).orElseThrow(() -> {
             log.warn("User with (id = {}) is not found", userId);
             throw new ObjectNotFoundException(String.format("User with (id = %d) is not found", userId));
-        }
+        });
 
         log.info("User with (id = {}) is fetched. User: {}", userId, customerResponse);
 

@@ -38,7 +38,7 @@ public class ProductServiceImpl implements ProductService {
         final ProductListRequest productsRequest = new ProductListRequest(listProductRequest);
 
         final List<ProductResponse> productsResponse = productClient.getAllProductsByIds(productsRequest);
-        if (productsResponse == null) {
+        if (productsResponse == null || productsResponse.isEmpty()) {
             log.warn("Products with (ids = {}) are not found", productIdsRow);
             throw new ObjectNotFoundException(String.format("Products with (ids = %s) are not found", productIdsRow));
         }
