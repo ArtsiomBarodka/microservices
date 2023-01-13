@@ -104,7 +104,50 @@ services:
       - "9411:9411"
     restart: unless-stopped
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.2.0
+    volumes:
+      - elastic-data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl --fail http://localhost:9200 || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.2.0
+    restart: unless-stopped
+    ports:
+      - "5601:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl --fail http://localhost:5601 || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+
 volumes:
     mysql_order:
     mysql_customer:
     mongodb:
+    elastic-data:

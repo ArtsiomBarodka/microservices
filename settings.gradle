@@ -8,4 +8,5 @@ include 'common'
 include 'api-gateway'
 include 'customer'
 include 'order-orchestrator'
+include 'product-search'
 

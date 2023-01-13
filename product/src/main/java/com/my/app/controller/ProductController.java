@@ -5,11 +5,11 @@ import com.epam.app.model.request.ProductRequest;
 import com.epam.app.model.request.UpdateProductListRequest;
 import com.epam.app.model.response.ProductResponse;
 import com.my.app.config.PropertiesConfig;
+import com.my.app.facade.ProductFacade;
 import com.my.app.model.UpdateOperationType;
 import com.my.app.model.converter.FromDtoToResponseProductConverter;
 import com.my.app.model.converter.FromRequestToDtoOrderProductListConverter;
 import com.my.app.model.dto.ProductDto;
-import com.my.app.service.ProductService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +36,7 @@ import static java.util.stream.Collectors.toList;
 @RequestMapping("/api/v1/products")
 public class ProductController {
     private PropertiesConfig propertiesConfig;
-    private ProductService productService;
+    private ProductFacade productFacade;
     private FromDtoToResponseProductConverter toResponseProductConverter;
     private FromRequestToDtoOrderProductListConverter toDtoProductConverter;
 
@@ -47,7 +47,7 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable @NotBlank String id) {
-        final ProductDto product = productService.getProductById(id);
+        final ProductDto product = productFacade.getProductById(id);
 
         final ProductResponse convertedResult = toResponseProductConverter.convert(product);
         log.info("Product response for (id = {}). Product: {}", id, convertedResult);
@@ -57,11 +57,9 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<Collection<ProductResponse>> getAllProducts() {
-        final Collection<ProductDto> products = productService.getAllProducts();
+        final Collection<ProductDto> products = productFacade.getAllProducts();
 
-        final List<ProductResponse> convertedResult = products.stream()
-                .map(toResponseProductConverter::convert)
-                .collect(toList());
+        final List<ProductResponse> convertedResult = products.stream().map(toResponseProductConverter::convert).collect(toList());
         log.info("All Products response. Products: {}", convertedResult);
 
         return ResponseEntity.ok(convertedResult);
@@ -69,15 +67,11 @@ public class ProductController {
 
     @PostMapping("/all")
     public ResponseEntity<Collection<ProductResponse>> getAllProductsByIds(@RequestBody @Valid ProductListRequest productsRequest) {
-        final List<String> ids = productsRequest.getProducts().stream()
-                .map(ProductRequest::getId).
-                collect(toList());
+        final List<String> ids = productsRequest.getProducts().stream().map(ProductRequest::getId).collect(toList());
 
-        final Collection<ProductDto> products = productService.getAllProductsByIds(ids);
+        final Collection<ProductDto> products = productFacade.getAllProductsByIds(ids);
 
-        final List<ProductResponse> convertedResult = products.stream()
-                .map(toResponseProductConverter::convert)
-                .collect(toList());
+        final List<ProductResponse> convertedResult = products.stream().map(toResponseProductConverter::convert).collect(toList());
         log.info("Products response for (ids = {}). Products: {}", ids, convertedResult);
 
         return ResponseEntity.ok(convertedResult);
@@ -85,11 +79,9 @@ public class ProductController {
 
     @PatchMapping("/count/subtract")
     public ResponseEntity<Collection<ProductResponse>> subtractProductsCount(@RequestBody @Valid UpdateProductListRequest updateProductListRequest) {
-        final Collection<ProductDto> products = productService.updateAllProducts(toDtoProductConverter.convert(updateProductListRequest), UpdateOperationType.SUBTRACT);
+        final Collection<ProductDto> products = productFacade.updateAllProducts(toDtoProductConverter.convert(updateProductListRequest), UpdateOperationType.SUBTRACT);
 
-        final List<ProductResponse> convertedResult = products.stream()
-                .map(toResponseProductConverter::convert)
-                .collect(toList());
+        final List<ProductResponse> convertedResult = products.stream().map(toResponseProductConverter::convert).collect(toList());
         log.info("Updated Products response after subtracting count for (request = {}) . Updated Products: {}", updateProductListRequest, convertedResult);
 
         return ResponseEntity.ok(convertedResult);
@@ -97,11 +89,9 @@ public class ProductController {
 
     @PatchMapping("/count/add")
     public ResponseEntity<Collection<ProductResponse>> addProductsCount(@RequestBody @Valid UpdateProductListRequest updateProductListRequest) {
-        final Collection<ProductDto> products = productService.updateAllProducts(toDtoProductConverter.convert(updateProductListRequest), UpdateOperationType.ADD);
+        final Collection<ProductDto> products = productFacade.updateAllProducts(toDtoProductConverter.convert(updateProductListRequest), UpdateOperationType.ADD);
 
-        final List<ProductResponse> convertedResult = products.stream()
-                .map(toResponseProductConverter::convert)
-                .collect(toList());
+        final List<ProductResponse> convertedResult = products.stream().map(toResponseProductConverter::convert).collect(toList());
         log.info("Updated Products response after adding count for (request = {}) . Updated Products: {}", updateProductListRequest, convertedResult);
 
         return ResponseEntity.ok(convertedResult);
@@ -109,11 +99,9 @@ public class ProductController {
 
     @PatchMapping
     public ResponseEntity<Collection<ProductResponse>> updateAllProductsInfo(@RequestBody @Valid UpdateProductListRequest updateProductListRequest) {
-        final Collection<ProductDto> products = productService.updateAllProducts(toDtoProductConverter.convert(updateProductListRequest), UpdateOperationType.UPDATE);
+        final Collection<ProductDto> products = productFacade.updateAllProducts(toDtoProductConverter.convert(updateProductListRequest), UpdateOperationType.UPDATE);
 
-        final List<ProductResponse> convertedResult = products.stream()
-                .map(toResponseProductConverter::convert)
-                .collect(toList());
+        final List<ProductResponse> convertedResult = products.stream().map(toResponseProductConverter::convert).collect(toList());
         log.info("Updated Products response for (request = {}) . Updated Products: {}", updateProductListRequest, convertedResult);
 
         return ResponseEntity.ok(convertedResult);

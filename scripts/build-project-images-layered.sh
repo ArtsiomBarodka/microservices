@@ -35,6 +35,7 @@ unpack order order
 unpack customer customer
 unpack api-gateway api-gateway
 unpack order-orchestrator order-orchestrator
+unpack product-search product-search
 
 echo "Building Docker image"
 build config-server application/config-server
@@ -44,3 +45,4 @@ build order application/order
 build customer application/customer
 build api-gateway application/api-gateway
 build order-orchestrator application/order-orchestrator
+build product-search application/product-search

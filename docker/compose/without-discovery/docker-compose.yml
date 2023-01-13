@@ -237,6 +237,34 @@ services:
       SPRING_PROFILES_ACTIVE: withoutLoadBalancer
       LOGGING_FILE_NAME: logs/order/order.log
 
+  product-search:
+    image: application/product-search:latest
+    volumes:
+      - shared_logs_volume:/opt/logs
+    depends_on:
+      config-server:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    ports:
+      - "8085:8085"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8085/actuator/health" ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    environment:
+      SERVER_PORT: 8085
+      EUREKA_CLIENT_ENABLED: "false"
+      CONFIG_URI: http://config-server:8888/
+      KAFKA_URI: http://kafka:9092
+      ZIPKIN_URI: http://zipkin:9411/
+      ELASTIC_SEARCH_URI: elasticsearch:9200
+      LOGGING_FILE_NAME: logs/product-search/product.log
+
   product:
     image: application/product:latest
     volumes:
@@ -247,6 +275,8 @@ services:
       kafka:
         condition: service_healthy
       mongodb:
+        condition: service_healthy
+      product-search:
         condition: service_healthy
     ports:
       - "8082:8082"
@@ -324,6 +354,7 @@ services:
       KAFKA_URI: http://kafka:9092
       ORDER_URI: http://order:8081
       PRODUCT_URI: http://product:8082
+      PRODUCT_SEARCH_URI: http://product-search:8082
       CUSTOMER_URI: http://customer:8083
       ZIPKIN_URI: http://zipkin:9411/
       LOGGING_FILE_NAME: logs/api-gateway/api-gateway.log
