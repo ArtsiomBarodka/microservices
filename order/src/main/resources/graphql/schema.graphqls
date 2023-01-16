@@ -1,0 +1,51 @@
+scalar LocalDateTime
+scalar BigDecimal
+
+type Query {
+    order(id: ID): Order
+    orders(userId: ID): [Order]
+}
+
+type Order {
+    id: ID!
+    user: User!
+    status: Status!
+    created: LocalDateTime!
+    orderItems: [OrderItem!]!
+}
+
+type User {
+    id: ID!
+    name: String!
+    email: String!
+}
+
+type OrderItem {
+    id: ID!
+    product: Product!
+    cost: BigDecimal!
+    count: Int!
+}
+
+type Product {
+    id: String!
+    name: String!
+    description: String!
+    category: Category!
+    cost: BigDecimal!
+    storage: String
+    ram: String
+    processor: String
+    hasBluetooth: Boolean
+}
+
+enum Status {
+    COMPLETED,
+    CREATED,
+    REJECTED
+}
+
+enum Category {
+    SMARTPHONE,
+    LAPTOP
+}

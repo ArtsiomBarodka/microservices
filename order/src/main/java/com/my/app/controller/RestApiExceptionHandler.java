@@ -18,7 +18,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
-public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
+public class RestApiExceptionHandler extends ResponseEntityExceptionHandler {
     private static final String OBJECT_NOT_FOUND_MESSAGE_EXCEPTION = "Object is not found!";
     private static final String HANDLE_PROCESS_MESSAGE_EXCEPTION = "The process is failed!";
     private static final String VALIDATION_MESSAGE_EXCEPTION = "The validation is failed!";

@@ -38,7 +38,7 @@ import static java.util.stream.Collectors.toList;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/v1/orders")
-public class OrderController {
+public class OrderRestController {
     private OrderFacade orderFacade;
     private PropertiesConfig propertiesConfig;
     private FromDtoToResponseOrderConverter toResponseOrderConverter;

@@ -10,7 +10,6 @@ repositories {
     mavenCentral()
 }
 
-
 allprojects {
     apply plugin: 'java'
     apply plugin: 'org.springframework.boot'
@@ -24,9 +23,10 @@ allprojects {
     }
 
     ext {
-        springCloudVersion = "2021.0.1"
+        springCloudVersion = '2021.0.1'
         modelmapperVersion = '3.1.0'
-        mySqlConnectorVersion = "8.0.22"
+        mySqlConnectorVersion = '8.0.22'
+        graphqlScalarsVersion = '20.0'
     }
 
     repositories {
