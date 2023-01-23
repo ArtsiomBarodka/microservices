@@ -12,6 +12,9 @@ import com.my.app.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -61,20 +64,23 @@ public class CustomerController {
         return ResponseEntity.ok(convertedResult);
     }
 
+    @PreAuthorize("hasRole('customer')")
     @JsonView(View.Private.class)
     @GetMapping("/current")
-    public ResponseEntity<CustomerResponse> getCurrentCustomer() {
-        final CustomerDto result = customerService.getCustomerById(1L);
+    public ResponseEntity<CustomerResponse> getCurrentCustomer(@AuthenticationPrincipal Jwt jwt) {
+        final Long id = jwt.getClaim("customer_id");
+        final CustomerDto result = customerService.getCustomerById(id);
 
         final CustomerResponse convertedResult = toResponseCustomerConverter.convert(result);
-        log.info("Customer response for (id = {}). Customer: {}", 1L, convertedResult);
+        log.info("Customer response for (id = {}). Customer: {}", id, convertedResult);
 
         return ResponseEntity.ok(convertedResult);
     }
 
+    @PreAuthorize("hasRole('customer') and #updateCustomerRequest.id == #jwt.getClaim('customer_id')")
     @JsonView(View.Public.class)
     @PatchMapping("/funds/subtract")
-    public ResponseEntity<CustomerResponse> subtractCustomerFund(@Valid @RequestBody UpdateCustomerRequest updateCustomerRequest) {
+    public ResponseEntity<CustomerResponse> subtractCustomerFund(@Valid @RequestBody UpdateCustomerRequest updateCustomerRequest, @AuthenticationPrincipal Jwt jwt) {
         final CustomerDto updateFields = toDtoCustomerConverter.convert(updateCustomerRequest);
         final CustomerDto updatedCustomer = customerService.updateCustomer(updateFields, UpdateOption.SUBTRACT_FUND);
 
@@ -84,9 +90,10 @@ public class CustomerController {
         return ResponseEntity.ok(convertedResult);
     }
 
+    @PreAuthorize("hasRole('customer') and #updateCustomerRequest.id == #jwt.getClaim('customer_id')")
     @JsonView(View.Private.class)
     @PatchMapping("/funds/add")
-    public ResponseEntity<CustomerResponse> addCustomerFund(@Valid @RequestBody UpdateCustomerRequest updateCustomerRequest) {
+    public ResponseEntity<CustomerResponse> addCustomerFund(@Valid @RequestBody UpdateCustomerRequest updateCustomerRequest, @AuthenticationPrincipal Jwt jwt) {
         final CustomerDto updateFields = toDtoCustomerConverter.convert(updateCustomerRequest);
         final CustomerDto updatedCustomer = customerService.updateCustomer(updateFields, UpdateOption.ADD_FUND);
 
@@ -96,9 +103,10 @@ public class CustomerController {
         return ResponseEntity.ok(convertedResult);
     }
 
+    @PreAuthorize("hasRole('customer') and #updateCustomerRequest.id == #jwt.getClaim('customer_id')")
     @JsonView(View.Private.class)
     @PatchMapping
-    public ResponseEntity<CustomerResponse> updateCustomerInfo(@Valid @RequestBody UpdateCustomerRequest updateCustomerRequest) {
+    public ResponseEntity<CustomerResponse> updateCustomerInfo(@Valid @RequestBody UpdateCustomerRequest updateCustomerRequest, @AuthenticationPrincipal Jwt jwt) {
         final CustomerDto updateFields = toDtoCustomerConverter.convert(updateCustomerRequest);
         final CustomerDto updatedCustomer = customerService.updateCustomer(updateFields, UpdateOption.UPDATE_INFO);
 

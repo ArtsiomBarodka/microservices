@@ -7,7 +7,7 @@ import org.springframework.lang.NonNull;
 import java.util.List;
 
 public interface ProductClient {
-    List<ProductResponse> subtractProductsCount(@NonNull UpdateProductListRequest updateProductListRequest);
+    List<ProductResponse> subtractProductsCount(@NonNull UpdateProductListRequest updateProductListRequest, @NonNull String token);
 
-    List<ProductResponse> addProductsCount(@NonNull UpdateProductListRequest updateProductListRequest);
+    List<ProductResponse> addProductsCount(@NonNull UpdateProductListRequest updateProductListRequest, @NonNull String token);
 }

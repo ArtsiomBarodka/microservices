@@ -22,9 +22,9 @@ public class ProductSubtractionOperation implements Operation {
 
     @Override
     @NonNull
-    public OperationResultStatus process(@NonNull OrderDto orderDto) {
+    public OperationResultStatus process(@NonNull OrderDto orderDto, @NonNull String token) {
         UpdateProductListRequest request = toUpdateProductListRequest(orderDto);
-        List<ProductResponse> productResponses = productClient.subtractProductsCount(request);
+        List<ProductResponse> productResponses = productClient.subtractProductsCount(request, token);
         if (productResponses == null || productResponses.isEmpty()) {
             return OperationResultStatus.FAILED;
         }
@@ -33,9 +33,9 @@ public class ProductSubtractionOperation implements Operation {
 
     @Override
     @NonNull
-    public OperationResultStatus revert(@NonNull OrderDto orderDto) {
+    public OperationResultStatus revert(@NonNull OrderDto orderDto, @NonNull String token) {
         UpdateProductListRequest request = toUpdateProductListRequest(orderDto);
-        List<ProductResponse> productResponses = productClient.addProductsCount(request);
+        List<ProductResponse> productResponses = productClient.addProductsCount(request, token);
         if (productResponses == null || productResponses.isEmpty()) {
             return OperationResultStatus.FAILED;
         }

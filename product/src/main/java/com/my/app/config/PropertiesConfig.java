@@ -23,4 +23,7 @@ public class PropertiesConfig {
 
     @Value("${kafka.productSearch.topic.product.name}")
     private String kafkaTopicProductName;
+
+    @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
+    private String securityJwkSetUri;
 }

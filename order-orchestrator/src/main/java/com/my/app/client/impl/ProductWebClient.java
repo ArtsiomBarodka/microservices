@@ -29,8 +29,8 @@ public class ProductWebClient implements ProductClient {
     @CircuitBreaker(name = "product", fallbackMethod = "productFallback")
     @Retry(name = "product")
     @Override
-    public List<ProductResponse> subtractProductsCount(@NonNull UpdateProductListRequest updateProductListRequest) {
-        final String uri = propertiesConfig.getProductsHost() + "/api/v1/products/count/subtract";
+    public List<ProductResponse> subtractProductsCount(@NonNull UpdateProductListRequest updateProductListRequest, @NonNull String token) {
+        final String uri = propertiesConfig.getProductsHost() + "/api/v1/products/operation/count/subtract";
 
         log.info("Sending subtractProductsCount request to Product Service. Product Service URI = {},  Request: {}",
                 uri, updateProductListRequest);
@@ -38,6 +38,7 @@ public class ProductWebClient implements ProductClient {
         return webClient
                 .patch()
                 .uri(uri)
+                .headers(headers -> headers.setBearerAuth(token))
                 .bodyValue(updateProductListRequest)
                 .retrieve()
                 .onStatus(HttpStatus::is4xxClientError, clientResponse -> Mono.error(new ApiRejectedException()))
@@ -50,8 +51,8 @@ public class ProductWebClient implements ProductClient {
     @CircuitBreaker(name = "product", fallbackMethod = "productFallback")
     @Retry(name = "product")
     @Override
-    public List<ProductResponse> addProductsCount(@NonNull UpdateProductListRequest updateProductListRequest) {
-        final String uri = propertiesConfig.getProductsHost() + "/api/v1/products/count/add";
+    public List<ProductResponse> addProductsCount(@NonNull UpdateProductListRequest updateProductListRequest, @NonNull String token) {
+        final String uri = propertiesConfig.getProductsHost() + "/api/v1/products/operation/count/add";
 
         log.info("Sending addProductsCount request to Product Service. Product Service URI = {},  Request: {}",
                 uri, updateProductListRequest);
@@ -59,6 +60,7 @@ public class ProductWebClient implements ProductClient {
         return webClient
                 .patch()
                 .uri(uri)
+                .headers(headers -> headers.setBearerAuth(token))
                 .bodyValue(updateProductListRequest)
                 .retrieve()
                 .onStatus(HttpStatus::is4xxClientError, clientResponse -> Mono.error(new ApiRejectedException()))

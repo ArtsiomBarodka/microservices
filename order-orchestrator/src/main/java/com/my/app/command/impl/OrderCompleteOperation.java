@@ -20,9 +20,9 @@ public class OrderCompleteOperation implements Operation {
 
     @Override
     @NonNull
-    public OperationResultStatus process(@NonNull OrderDto orderDto) {
+    public OperationResultStatus process(@NonNull OrderDto orderDto, @NonNull String token) {
         final UpdateOrderStatusRequest request = toUpdateOrderStatusRequest(orderDto, OrderStatus.COMPLETED);
-        final Optional<OrderStatusResponse> response = orderClient.updateOrderStatus(request);
+        final Optional<OrderStatusResponse> response = orderClient.updateOrderStatus(request, token);
         if (response.isPresent()) {
             return OperationResultStatus.COMPLETE;
         }
@@ -31,9 +31,9 @@ public class OrderCompleteOperation implements Operation {
 
     @Override
     @NonNull
-    public OperationResultStatus revert(@NonNull OrderDto orderDto) {
+    public OperationResultStatus revert(@NonNull OrderDto orderDto, @NonNull String token) {
         final UpdateOrderStatusRequest request = toUpdateOrderStatusRequest(orderDto, OrderStatus.REJECTED);
-        final Optional<OrderStatusResponse> response = orderClient.updateOrderStatus(request);
+        final Optional<OrderStatusResponse> response = orderClient.updateOrderStatus(request, token);
         if (response.isPresent()) {
             return OperationResultStatus.COMPLETE;
         }

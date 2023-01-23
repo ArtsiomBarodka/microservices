@@ -12,6 +12,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.BatchMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 import java.util.Collection;
@@ -30,11 +31,13 @@ public class OrderGraphQLController {
     private UserService userService;
     private ProductService productService;
 
+    @PreAuthorize("hasRole('customer') or hasRole('owner')")
     @QueryMapping(name = "order")
     public OrderDto getOrderById(@Argument Long id) {
         return orderService.getOrderById(id);
     }
 
+    @PreAuthorize("hasRole('customer') or hasRole('owner')")
     @QueryMapping(name = "orders")
     public Collection<OrderDto> getOrdersByUserId(@Argument Long userId) {
         return orderService.getAllOrdersByUserId(userId);

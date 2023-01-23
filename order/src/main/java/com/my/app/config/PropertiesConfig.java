@@ -23,4 +23,7 @@ public class PropertiesConfig {
 
     @Value("${kafka.orderOrchestrator.topic.newOrder.name}")
     private String kafkaTopicNewOrderName;
+
+    @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
+    private String securityJwkSetUri;
 }

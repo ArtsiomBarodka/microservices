@@ -19,9 +19,9 @@ public class CustomerPaymentOperation implements Operation {
 
     @Override
     @NonNull
-    public OperationResultStatus process(@NonNull OrderDto orderDto) {
+    public OperationResultStatus process(@NonNull OrderDto orderDto, @NonNull String token) {
         UpdateCustomerRequest request = toUpdateCustomerRequest(orderDto);
-        Optional<CustomerResponse> customerResponse = customerClient.subtractCustomerFund(request);
+        Optional<CustomerResponse> customerResponse = customerClient.subtractCustomerFund(request, token);
         if (customerResponse.isPresent()) {
             return OperationResultStatus.COMPLETE;
         }
@@ -30,9 +30,9 @@ public class CustomerPaymentOperation implements Operation {
 
     @Override
     @NonNull
-    public OperationResultStatus revert(@NonNull OrderDto orderDto) {
+    public OperationResultStatus revert(@NonNull OrderDto orderDto, @NonNull String token) {
         UpdateCustomerRequest request = toUpdateCustomerRequest(orderDto);
-        Optional<CustomerResponse> customerResponse = customerClient.addCustomerFund(request);
+        Optional<CustomerResponse> customerResponse = customerClient.addCustomerFund(request, token);
         if (customerResponse.isPresent()) {
             return OperationResultStatus.COMPLETE;
         }

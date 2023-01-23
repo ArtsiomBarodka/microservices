@@ -7,5 +7,5 @@ import org.springframework.lang.NonNull;
 import java.util.Optional;
 
 public interface OrderClient {
-    Optional<OrderStatusResponse> updateOrderStatus(@NonNull UpdateOrderStatusRequest updateOrderStatusRequest);
+    Optional<OrderStatusResponse> updateOrderStatus(@NonNull UpdateOrderStatusRequest updateOrderStatusRequest, @NonNull String token);
 }

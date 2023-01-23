@@ -16,6 +16,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -51,6 +54,7 @@ public class OrderRestController {
         return "Hello from " + propertiesConfig.getName();
     }
 
+    @PreAuthorize("hasRole('customer') or hasRole('owner')")
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> getOrderById(@PathVariable @NotNull @Min(1) Long id) {
         final OrderDto result = orderFacade.getOrderById(id);
@@ -61,6 +65,7 @@ public class OrderRestController {
         return ResponseEntity.ok(convertedResult);
     }
 
+    @PreAuthorize("hasRole('customer') or hasRole('owner')")
     @GetMapping("/user/{id}")
     public ResponseEntity<List<OrderResponse>> getAllOrdersByUserId(@PathVariable @NotNull @Min(1) Long id) {
         final Collection<OrderDto> result = orderFacade.getAllOrdersByUserId(id);
@@ -73,8 +78,9 @@ public class OrderRestController {
         return ResponseEntity.ok(convertedResult);
     }
 
+    @PreAuthorize("hasRole('customer') and #orderRequest.userId == #jwt.getClaim('customer_id')")
     @PostMapping
-    public ResponseEntity<OrderResponse> createOrder(@RequestBody @Valid OrderRequest orderRequest) {
+    public ResponseEntity<OrderResponse> createOrder(@RequestBody @Valid OrderRequest orderRequest, @AuthenticationPrincipal Jwt jwt) {
         final OrderDto newOrderFields = toDtoOrderConverter.convert(orderRequest);
         final OrderDto createdOrder = orderFacade.createOrder(newOrderFields);
 
@@ -84,6 +90,7 @@ public class OrderRestController {
         return new ResponseEntity<>(convertedResult, HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasRole('customer')")
     @PatchMapping("/status")
     public ResponseEntity<OrderStatusResponse> updateOrderStatus(@RequestBody @Valid UpdateOrderStatusRequest updateOrderStatusRequest) {
         final OrderStatusDto orderStatusUpdateFields = toDtoOrderStatusConverter.convert(updateOrderStatusRequest);

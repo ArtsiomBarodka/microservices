@@ -5,6 +5,7 @@ import com.epam.app.model.response.ProductResponse;
 import com.my.app.client.ProductClient;
 import com.my.app.config.PropertiesConfig;
 import com.my.app.model.exception.ApiClientErrorException;
+import com.my.app.utils.SecurityUtils;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,7 @@ public class ProductWebClient implements ProductClient {
         return webClient
                 .post()
                 .uri(uri)
+                .headers(headers -> headers.setBearerAuth(SecurityUtils.getAuthToken()))
                 .bodyValue(productListRequest)
                 .retrieve()
                 .onStatus(HttpStatus::is4xxClientError, clientResponse -> Mono.error(new ApiClientErrorException()))

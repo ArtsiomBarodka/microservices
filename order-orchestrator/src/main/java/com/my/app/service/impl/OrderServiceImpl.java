@@ -24,7 +24,7 @@ public class OrderServiceImpl implements OrderService {
     private final PropertiesConfig propertiesConfig;
 
     @Override
-    public void processOrder(@NonNull OrderDto orderDto) {
+    public void processOrder(@NonNull OrderDto orderDto, @NonNull String token) {
         log.info("Starting operations process...");
 
         final List<Operation> operations = operationsProvider.getAllProcessOperations();
@@ -35,14 +35,14 @@ public class OrderServiceImpl implements OrderService {
                 .collect(Collectors.toList()));
 
         for (Operation operation : operations) {
-            OperationResultStatus resultStatus = operation.process(orderDto);
+            OperationResultStatus resultStatus = operation.process(orderDto, token);
 
             if (resultStatus == OperationResultStatus.COMPLETE) {
                 log.info("Process Operation {} is completed for Order: {}", operation.getClass().getName(), orderDto);
                 finishedOperations.add(operation);
             } else {
                 log.warn("Process Operation {} is failed for Order: {}", operation.getClass().getName(), orderDto);
-                processRevert(finishedOperations, orderDto);
+                processRevert(finishedOperations, orderDto, token);
                 break;
             }
         }
@@ -50,7 +50,7 @@ public class OrderServiceImpl implements OrderService {
         log.info("Operations process was finished");
     }
 
-    private void processRevert(List<Operation> finishedOperations, OrderDto orderDto) {
+    private void processRevert(List<Operation> finishedOperations, OrderDto orderDto, String token) {
         log.info("Starting revert process...");
 
         Collections.reverse(finishedOperations);
@@ -62,12 +62,12 @@ public class OrderServiceImpl implements OrderService {
                 .collect(Collectors.toList()));
 
         for (Operation operation : finishedOperations) {
-            OperationResultStatus resultStatus = operation.revert(orderDto);
+            OperationResultStatus resultStatus = operation.revert(orderDto, token);
 
             if (resultStatus == OperationResultStatus.FAILED) {
                 // if revert operation is failed, try again
                 for (int i = 0; i < propertiesConfig.getOperationRetriesCount(); i++) {
-                    resultStatus = operation.revert(orderDto);
+                    resultStatus = operation.revert(orderDto, token);
 
                     // if revert operation is completed, return to apply remaining revert operations
                     if (resultStatus == OperationResultStatus.COMPLETE) {

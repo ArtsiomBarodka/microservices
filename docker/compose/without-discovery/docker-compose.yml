@@ -18,9 +18,9 @@ services:
       - "29092:29092"
     healthcheck:
       test: ["CMD", "nc", "-vz", "localhost", "29092"]
-      interval: 5s
-      timeout: 10s
-      retries: 5
+      interval: 10s
+      timeout: 15s
+      retries: 7
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
@@ -39,7 +39,7 @@ services:
       test: ["CMD", "mysqladmin", "-u$$MYSQL_USER", "-p$$MYSQL_ROOT_PASSWORD",  "ping", "-h", "localhost"]
       interval: 5s
       timeout: 10s
-      retries: 5
+      retries: 7
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: microservices
@@ -58,7 +58,7 @@ services:
       test: [ "CMD", "mysqladmin", "-u$$MYSQL_USER", "-p$$MYSQL_ROOT_PASSWORD",  "ping", "-h", "localhost" ]
       interval: 5s
       timeout: 10s
-      retries: 5
+      retries: 7
     environment:
       MYSQL_DATABASE: microservices
       MYSQL_USER: user
@@ -76,7 +76,7 @@ services:
       test: ["CMD","mongo", "--eval", "db.adminCommand('ping')"]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 7
     environment:
       MONGO_INITDB_ROOT_USERNAME: user
       MONGO_INITDB_ROOT_PASSWORD: password
@@ -126,7 +126,7 @@ services:
         ]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 7
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
@@ -149,9 +149,47 @@ services:
         ]
       interval: 30s
       timeout: 10s
-      retries: 3
+      retries: 7
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+
+  postgres-keycloak:
+    image: postgres:11
+    volumes:
+      - keycloak-data:/var/lib/postgresql/data
+    ports:
+      - "5406:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 30s
+      timeout: 5s
+      retries: 7
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=keycloak
+
+  keycloak:
+    image: jboss/keycloak
+    ports:
+      - "8090:8080"
+    depends_on:
+      postgres-keycloak:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-I", "http://localhost:8080/auth" ]
+      interval: 30s
+      timeout: 5s
+      retries: 8
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_VENDOR: postgres
+      DB_ADDR: postgres-keycloak
+      DB_PORT: 5432
 
   config-server:
     image: application/config-server:latest
@@ -167,7 +205,7 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
       interval: 30s
       timeout: 5s
-      retries: 5
+      retries: 7
     environment:
       SERVER_PORT: 8888
       EUREKA_CLIENT_ENABLED: "false"
@@ -191,7 +229,7 @@ services:
       test: [ "CMD", "curl", "-f", "http://localhost:8084/actuator/health" ]
       interval: 30s
       timeout: 5s
-      retries: 5
+      retries: 7
     environment:
       SERVER_PORT: 8084
       EUREKA_CLIENT_ENABLED: "false"
@@ -215,6 +253,8 @@ services:
         condition: service_healthy
       mysql_order:
         condition: service_healthy
+      keycloak:
+        condition: service_healthy
       order-orchestrator:
         condition: service_healthy
     ports:
@@ -224,7 +264,7 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
       interval: 30s
       timeout: 5s
-      retries: 5
+      retries: 7
     environment:
       SERVER_PORT: 8081
       EUREKA_CLIENT_ENABLED: "false"
@@ -234,6 +274,7 @@ services:
       PRODUCT_URI: http://product:8082
       CUSTOMER_URI: http://customer:8083
       ZIPKIN_URI: http://zipkin:9411/
+      RESOURCE_SERVER_URI: http://keycloak:8080
       SPRING_PROFILES_ACTIVE: withoutLoadBalancer
       LOGGING_FILE_NAME: logs/order/order.log
 
@@ -248,6 +289,8 @@ services:
         condition: service_healthy
       elasticsearch:
         condition: service_healthy
+      keycloak:
+        condition: service_healthy
     ports:
       - "8085:8085"
     restart: unless-stopped
@@ -255,7 +298,7 @@ services:
       test: [ "CMD", "curl", "-f", "http://localhost:8085/actuator/health" ]
       interval: 30s
       timeout: 5s
-      retries: 5
+      retries: 7
     environment:
       SERVER_PORT: 8085
       EUREKA_CLIENT_ENABLED: "false"
@@ -263,6 +306,7 @@ services:
       KAFKA_URI: http://kafka:9092
       ZIPKIN_URI: http://zipkin:9411/
       ELASTIC_SEARCH_URI: elasticsearch:9200
+      RESOURCE_SERVER_URI: http://keycloak:8080
       LOGGING_FILE_NAME: logs/product-search/product.log
 
   product:
@@ -276,6 +320,8 @@ services:
         condition: service_healthy
       mongodb:
         condition: service_healthy
+      keycloak:
+        condition: service_healthy
       product-search:
         condition: service_healthy
     ports:
@@ -285,13 +331,14 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
       interval: 30s
       timeout: 5s
-      retries: 5
+      retries: 7
     environment:
       SERVER_PORT: 8082
       EUREKA_CLIENT_ENABLED: "false"
       CONFIG_URI: http://config-server:8888/
       KAFKA_URI: http://kafka:9092
       ZIPKIN_URI: http://zipkin:9411/
+      RESOURCE_SERVER_URI: http://keycloak:8080
       MONGO_DB_HOST: mongodb
       MONGO_DB_PORT: 27017
       LOGGING_FILE_NAME: logs/product/product.log
@@ -307,6 +354,8 @@ services:
         condition: service_healthy
       mysql_customer:
         condition: service_healthy
+      keycloak:
+        condition: service_healthy
     ports:
       - "8083:8083"
     restart: unless-stopped
@@ -314,7 +363,7 @@ services:
       test: [ "CMD", "curl", "-f", "http://localhost:8083/actuator/health" ]
       interval: 30s
       timeout: 5s
-      retries: 5
+      retries: 7
     environment:
       SERVER_PORT: 8083
       EUREKA_CLIENT_ENABLED: "false"
@@ -322,6 +371,7 @@ services:
       KAFKA_URI: http://kafka:9092
       MYSQL_URL: mysql_customer:3306
       ZIPKIN_URI: http://zipkin:9411/
+      RESOURCE_SERVER_URI: http://keycloak:8080
       LOGGING_FILE_NAME: logs/customer/customer.log
 
   api-gateway:
@@ -346,7 +396,7 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:8887/actuator/health"]
       interval: 30s
       timeout: 5s
-      retries: 5
+      retries: 7
     environment:
       SERVER_PORT: 8887
       EUREKA_CLIENT_ENABLED: "false"
@@ -365,3 +415,4 @@ volumes:
   mongodb:
   elastic-data:
   shared_logs_volume:
+  keycloak-data:

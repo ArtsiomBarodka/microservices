@@ -1,5 +1,6 @@
 package com.my.app.consumer;
 
+import com.epam.app.constants.KafkaCustomHeaders;
 import com.epam.app.model.message.OrderMessage;
 import com.my.app.model.converter.FromMessageToOrderDtoConverter;
 import com.my.app.model.dto.OrderDto;
@@ -21,11 +22,13 @@ public class OrderKafkaConsumer {
     @KafkaListener(topics = "#{'${kafka.orderOrchestrator.topic.newOrder.name}'.split(',')}", containerFactory = "orderKafkaListenerContainerFactory")
     public void processOrder(OrderMessage orderMessage,
                              @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-                             @Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String msgKey) {
+                             @Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String msgKey,
+                             @Header(KafkaCustomHeaders.AUTHORIZATION) String token) {
         final Long orderId = orderMessage.getOrderId();
+        log.info("Authorization Header is received: Token = {}", token);
         log.info("new created Order is receive: topic = {}, key = {}, orderId = {}", topic, msgKey, orderId);
 
         final OrderDto orderDto = toOrderDtoConverter.convert(orderMessage);
-        orderService.processOrder(orderDto);
+        orderService.processOrder(orderDto, token);
     }
 }

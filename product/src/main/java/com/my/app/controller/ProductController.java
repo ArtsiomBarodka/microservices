@@ -13,6 +13,7 @@ import com.my.app.model.dto.ProductDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -65,6 +66,7 @@ public class ProductController {
         return ResponseEntity.ok(convertedResult);
     }
 
+    @PreAuthorize("hasRole('customer')")
     @PostMapping("/all")
     public ResponseEntity<Collection<ProductResponse>> getAllProductsByIds(@RequestBody @Valid ProductListRequest productsRequest) {
         final List<String> ids = productsRequest.getProducts().stream().map(ProductRequest::getId).collect(toList());
@@ -77,6 +79,29 @@ public class ProductController {
         return ResponseEntity.ok(convertedResult);
     }
 
+    @PreAuthorize("hasRole('customer')")
+    @PatchMapping("/operation/count/subtract")
+    public ResponseEntity<Collection<ProductResponse>> operationSubtractProductsCount(@RequestBody @Valid UpdateProductListRequest updateProductListRequest) {
+        final Collection<ProductDto> products = productFacade.updateAllProducts(toDtoProductConverter.convert(updateProductListRequest), UpdateOperationType.SUBTRACT);
+
+        final List<ProductResponse> convertedResult = products.stream().map(toResponseProductConverter::convert).collect(toList());
+        log.info("Updated Products operation response after subtracting count for (request = {}) . Updated Products: {}", updateProductListRequest, convertedResult);
+
+        return ResponseEntity.ok(convertedResult);
+    }
+
+    @PreAuthorize("hasRole('customer')")
+    @PatchMapping("/operation/count/add")
+    public ResponseEntity<Collection<ProductResponse>> operationAddProductsCount(@RequestBody @Valid UpdateProductListRequest updateProductListRequest) {
+        final Collection<ProductDto> products = productFacade.updateAllProducts(toDtoProductConverter.convert(updateProductListRequest), UpdateOperationType.ADD);
+
+        final List<ProductResponse> convertedResult = products.stream().map(toResponseProductConverter::convert).collect(toList());
+        log.info("Updated Products operation response after adding count for (request = {}) . Updated Products: {}", updateProductListRequest, convertedResult);
+
+        return ResponseEntity.ok(convertedResult);
+    }
+
+    @PreAuthorize("hasRole('owner')")
     @PatchMapping("/count/subtract")
     public ResponseEntity<Collection<ProductResponse>> subtractProductsCount(@RequestBody @Valid UpdateProductListRequest updateProductListRequest) {
         final Collection<ProductDto> products = productFacade.updateAllProducts(toDtoProductConverter.convert(updateProductListRequest), UpdateOperationType.SUBTRACT);
@@ -87,6 +112,7 @@ public class ProductController {
         return ResponseEntity.ok(convertedResult);
     }
 
+    @PreAuthorize("hasRole('owner')")
     @PatchMapping("/count/add")
     public ResponseEntity<Collection<ProductResponse>> addProductsCount(@RequestBody @Valid UpdateProductListRequest updateProductListRequest) {
         final Collection<ProductDto> products = productFacade.updateAllProducts(toDtoProductConverter.convert(updateProductListRequest), UpdateOperationType.ADD);
@@ -97,6 +123,7 @@ public class ProductController {
         return ResponseEntity.ok(convertedResult);
     }
 
+    @PreAuthorize("hasRole('owner')")
     @PatchMapping
     public ResponseEntity<Collection<ProductResponse>> updateAllProductsInfo(@RequestBody @Valid UpdateProductListRequest updateProductListRequest) {
         final Collection<ProductDto> products = productFacade.updateAllProducts(toDtoProductConverter.convert(updateProductListRequest), UpdateOperationType.UPDATE);

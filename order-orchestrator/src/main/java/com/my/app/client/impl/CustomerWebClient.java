@@ -27,7 +27,7 @@ public class CustomerWebClient implements CustomerClient {
     @CircuitBreaker(name = "customer", fallbackMethod = "customerFallback")
     @Retry(name = "customer")
     @Override
-    public Optional<CustomerResponse> subtractCustomerFund(@NonNull UpdateCustomerRequest updateCustomerRequest) {
+    public Optional<CustomerResponse> subtractCustomerFund(@NonNull UpdateCustomerRequest updateCustomerRequest, @NonNull String token) {
         final String uri = propertiesConfig.getCustomersHost() + "/api/v1/customers/funds/subtract";
 
         log.info("Sending subtractCustomerFund request to Customer Service. Customer Service URI = {},  Request: {}",
@@ -36,6 +36,7 @@ public class CustomerWebClient implements CustomerClient {
         return webClient
                 .patch()
                 .uri(uri)
+                .headers(headers -> headers.setBearerAuth(token))
                 .bodyValue(updateCustomerRequest)
                 .retrieve()
                 .onStatus(HttpStatus::is4xxClientError, clientResponse -> Mono.error(new ApiRejectedException()))
@@ -47,7 +48,7 @@ public class CustomerWebClient implements CustomerClient {
     @CircuitBreaker(name = "customer", fallbackMethod = "customerFallback")
     @Retry(name = "customer")
     @Override
-    public Optional<CustomerResponse> addCustomerFund(@NonNull UpdateCustomerRequest updateCustomerRequest) {
+    public Optional<CustomerResponse> addCustomerFund(@NonNull UpdateCustomerRequest updateCustomerRequest, @NonNull String token) {
         final String uri = propertiesConfig.getCustomersHost() + "/api/v1/customers/funds/add";
 
         log.info("Sending addCustomerFund request to Customer Service. Customer Service URI = {},  Request: {}",
@@ -56,6 +57,7 @@ public class CustomerWebClient implements CustomerClient {
         return webClient
                 .patch()
                 .uri(uri)
+                .headers(headers -> headers.setBearerAuth(token))
                 .bodyValue(updateCustomerRequest)
                 .retrieve()
                 .onStatus(HttpStatus::is4xxClientError, clientResponse -> Mono.error(new ApiRejectedException()))

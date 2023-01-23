@@ -29,4 +29,7 @@ public class PropertiesConfig {
 
     @Value("${kafka.productSearch.consumer.product.count}")
     private int kafkaConsumerProductCount;
+
+    @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
+    private String securityJwkSetUri;
 }

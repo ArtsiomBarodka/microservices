@@ -27,7 +27,7 @@ public class OrderWebClient implements OrderClient {
     @CircuitBreaker(name = "order", fallbackMethod = "orderFallback")
     @Retry(name = "order")
     @Override
-    public Optional<OrderStatusResponse> updateOrderStatus(@NonNull UpdateOrderStatusRequest updateOrderStatusRequest) {
+    public Optional<OrderStatusResponse> updateOrderStatus(@NonNull UpdateOrderStatusRequest updateOrderStatusRequest, @NonNull String token) {
         final String uri = propertiesConfig.getOrdersHost() + "/api/v1/orders/status";
 
         log.info("Sending updateOrderStatus request to Order Service. Order Service URI = {},  Request: {}",
@@ -36,6 +36,7 @@ public class OrderWebClient implements OrderClient {
         return webClient
                 .patch()
                 .uri(uri)
+                .headers(headers -> headers.setBearerAuth(token))
                 .bodyValue(updateOrderStatusRequest)
                 .retrieve()
                 .onStatus(HttpStatus::is4xxClientError, clientResponse -> Mono.error(new ApiRejectedException()))
