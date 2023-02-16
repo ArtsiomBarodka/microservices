@@ -4,11 +4,6 @@ metadata:
   name: product-search
 data:
   application.properties: |-
-    spring.cloud.loadbalancer.ribbon.enabled=false
-    spring.cloud.discovery.locator.enabled=true
-    spring.cloud.kubernetes.loadbalancer.enabled=true
-    spring.cloud.kubernetes.enabled=true
-    
     spring.sleuth.sampler.probability=1
     spring.zipkin.baseUrl=http://zipkin:9411/
     spring.zipkin.sender.type=web
@@ -18,6 +13,8 @@ data:
     
     app.elasticSearch.uri=elasticsearch:9200
     app.products.data.path=data/products_data.csv
+    
+    logging.file.name=logs/product-search/product-search.log
     
     kafka.productSearch.bootstrapAddress=kafka:9092
     kafka.productSearch.groupId=order-orchestrator

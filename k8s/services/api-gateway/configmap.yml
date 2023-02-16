@@ -4,14 +4,11 @@ metadata:
   name: api-gateway
 data:
   application.properties: |-
-    spring.cloud.loadbalancer.ribbon.enabled=false
-    spring.cloud.discovery.locator.enabled=true
-    spring.cloud.kubernetes.loadbalancer.enabled=true
-    spring.cloud.kubernetes.enabled=true
-    
     spring.sleuth.sampler.probability=1
     spring.zipkin.baseUrl=http://zipkin:9411/
     spring.zipkin.sender.type=web
+
+    logging.file.name=logs/api-gateway/api-gateway.log
 
     spring.cloud.gateway.routes[0].id=order
     spring.cloud.gateway.routes[0].uri=lb://order

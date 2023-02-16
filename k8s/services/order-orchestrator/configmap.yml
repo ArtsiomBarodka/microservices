@@ -4,11 +4,6 @@ metadata:
   name: order-orchestrator
 data:
   application.properties: |-
-    spring.cloud.loadbalancer.ribbon.enabled=false
-    spring.cloud.discovery.locator.enabled=true
-    spring.cloud.kubernetes.loadbalancer.enabled=true
-    spring.cloud.kubernetes.enabled=true
-    
     kafka.orderOrchestrator.bootstrapAddress=kafka:9092
     kafka.orderOrchestrator.groupId=order-orchestrator
     kafka.orderOrchestrator.topic.newOrder.name=newOrder
@@ -19,6 +14,8 @@ data:
     app.client.products.host=http://product
     app.client.customers.host=http://customer
     app.client.orders.host=http://order
+    
+    logging.file.name=logs/order-orchestrator/order-orchestrator.log
 
     spring.sleuth.sampler.probability=1
     spring.zipkin.baseUrl=http://zipkin:9411

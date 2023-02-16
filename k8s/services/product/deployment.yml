@@ -20,13 +20,6 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8082
-          args: [
-            "--spring.cloud.kubernetes.config.name=product",
-            "--spring.cloud.loadbalancer.ribbon.enabled=false",
-            "--spring.cloud.discovery.locator.enabled=true",
-            "--spring.cloud.kubernetes.loadbalancer.enabled=true",
-            "--spring.cloud.kubernetes.enabled=true",
-            "--logging.file.name=logs/product/product.log"]
           volumeMounts:
             - mountPath: /opt/logs
               name: shared-logs-volume

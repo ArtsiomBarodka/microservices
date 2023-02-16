@@ -30,8 +30,6 @@ echo "Building JAR files"
 gradle clean bootJar
 
 echo "Unpacking JARs"
-unpack config-server config-server
-unpack discovery-server discovery-server
 unpack product product
 unpack order order
 unpack customer customer
@@ -40,8 +38,6 @@ unpack order-orchestrator order-orchestrator
 unpack product-search product-search
 
 echo "Building Docker image"
-build config-server artsiombarodka/config-server
-build discovery-server artsiombarodka/discovery-server
 build product artsiombarodka/product
 build order artsiombarodka/order
 build customer artsiombarodka/customer

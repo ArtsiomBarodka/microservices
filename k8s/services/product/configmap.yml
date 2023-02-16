@@ -4,11 +4,6 @@ metadata:
   name: product
 data:
   application.properties: |-
-    spring.cloud.loadbalancer.ribbon.enabled=false
-    spring.cloud.discovery.locator.enabled=true
-    spring.cloud.kubernetes.loadbalancer.enabled=true
-    spring.cloud.kubernetes.enabled=true
-    
     spring.sleuth.sampler.probability=1
     spring.zipkin.baseUrl=http://zipkin:9411/
     spring.zipkin.sender.type=web
@@ -17,6 +12,8 @@ data:
 
     app.products.data.path=data/products_data.csv
     app.products.data.collection=product
+    
+    logging.file.name=logs/product/product.log
   
     spring.data.mongodb.authentication-database=admin
     spring.data.mongodb.host=mongo

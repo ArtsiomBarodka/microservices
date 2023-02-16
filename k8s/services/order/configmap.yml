@@ -4,17 +4,14 @@ metadata:
   name: order
 data:
   application.properties: |-
-    spring.cloud.loadbalancer.ribbon.enabled=false
-    spring.cloud.discovery.locator.enabled=true
-    spring.cloud.kubernetes.loadbalancer.enabled=true
-    spring.cloud.kubernetes.enabled=true
-    
     spring.sleuth.sampler.probability=1
     spring.zipkin.baseUrl=http://zipkin:9411/
     spring.zipkin.sender.type=web
 
     app.client.products.host=http://product
     app.client.customers.host=http://customer
+    
+    logging.file.name=logs/order/order.log
   
     kafka.orderOrchestrator.bootstrapAddress=kafka:9092
     kafka.orderOrchestrator.topic.newOrder.name=newOrder

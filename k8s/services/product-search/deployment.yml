@@ -22,13 +22,7 @@ spec:
             - containerPort: 8085
           args: [
             "--kubernetes.informer.enabled=false",
-            "--kubernetes.manifests.enabled=false",
-            "--spring.cloud.loadbalancer.ribbon.enabled=false",
-            "--spring.cloud.discovery.locator.enabled=true",
-            "--spring.cloud.kubernetes.loadbalancer.enabled=true",
-            "--spring.cloud.kubernetes.enabled=true",
-            "--spring.cloud.kubernetes.config.name=product-search",
-            "--logging.file.name=logs/product-search/product-search.log"]
+            "--kubernetes.manifests.enabled=false"]
           volumeMounts:
             - mountPath: /opt/logs
               name: shared-logs-volume

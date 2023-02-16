@@ -20,14 +20,6 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8887
-          args: [
-            "--spring.main.web-application-type=reactive",
-            "--spring.cloud.kubernetes.config.name=api-gateway",
-            "--spring.cloud.loadbalancer.ribbon.enabled=false",
-            "--spring.cloud.discovery.locator.enabled=true",
-            "--spring.cloud.kubernetes.loadbalancer.enabled=true",
-            "--spring.cloud.kubernetes.enabled=true",
-            "--logging.file.name=logs/api-gateway/api-gateway.log"]
           volumeMounts:
             - mountPath: /opt/logs
               name: shared-logs-volume

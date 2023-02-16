@@ -20,13 +20,6 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8084
-          args: [
-            "--spring.cloud.kubernetes.config.name=order-orchestrator",
-            "--spring.cloud.loadbalancer.ribbon.enabled=false",
-            "--spring.cloud.discovery.locator.enabled=true",
-            "--spring.cloud.kubernetes.loadbalancer.enabled=true",
-            "--spring.cloud.kubernetes.enabled=true",
-            "--logging.file.name=logs/order-orchestrator/order-orchestrator.log"]
           volumeMounts:
             - mountPath: /opt/logs
               name: shared-logs-volume
