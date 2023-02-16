@@ -20,6 +20,8 @@ function build() {
     --build-arg JAR_FOLDER=${FOLDER}/build/libs \
     -t ${NAME}:latest \
     -t ${NAME}:layered .
+
+  docker push ${NAME}:layered
 }
 
 cd ..
@@ -38,11 +40,11 @@ unpack order-orchestrator order-orchestrator
 unpack product-search product-search
 
 echo "Building Docker image"
-build config-server application/config-server
-build discovery-server application/discovery-server
-build product application/product
-build order application/order
-build customer application/customer
-build api-gateway application/api-gateway
-build order-orchestrator application/order-orchestrator
-build product-search application/product-search
+build config-server artsiombarodka/config-server
+build discovery-server artsiombarodka/discovery-server
+build product artsiombarodka/product
+build order artsiombarodka/order
+build customer artsiombarodka/customer
+build api-gateway artsiombarodka/api-gateway
+build order-orchestrator artsiombarodka/order-orchestrator
+build product-search artsiombarodka/product-search

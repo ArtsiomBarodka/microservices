@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-search-deployment
+  labels:
+    app: product-search
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product-search
+  template:
+    metadata:
+      labels:
+        app: product-search
+    spec:
+      containers:
+        - name: product-search
+          image: artsiombarodka/product-search:layered
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8085
+          args: [
+            "--kubernetes.informer.enabled=false",
+            "--kubernetes.manifests.enabled=false",
+            "--spring.cloud.loadbalancer.ribbon.enabled=false",
+            "--spring.cloud.discovery.locator.enabled=true",
+            "--spring.cloud.kubernetes.loadbalancer.enabled=true",
+            "--spring.cloud.kubernetes.enabled=true",
+            "--spring.cloud.kubernetes.config.name=product-search",
+            "--logging.file.name=logs/product-search/product-search.log"]
+          volumeMounts:
+            - mountPath: /opt/logs
+              name: shared-logs-volume
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8085
+            failureThreshold: 30
+            periodSeconds: 40
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8085
+            failureThreshold: 2
+            periodSeconds: 3
+            successThreshold: 1
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8085
+            failureThreshold: 2
+            periodSeconds: 3
+            successThreshold: 1
+      restartPolicy: Always
+      volumes:
+        - name: shared-logs-volume
+          persistentVolumeClaim:
+            claimName: shared-logs-volume-claim

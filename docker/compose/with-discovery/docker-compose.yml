@@ -152,7 +152,7 @@ services:
       timeout: 10s
       retries: 7
     environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
 
   postgres-keycloak:
     image: postgres:11
@@ -167,9 +167,9 @@ services:
       timeout: 5s
       retries: 7
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=keycloak
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: keycloak
 
   keycloak:
     image: jboss/keycloak

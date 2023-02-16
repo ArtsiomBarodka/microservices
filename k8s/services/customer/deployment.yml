@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customer-deployment
+  labels:
+    app: customer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: customer
+  template:
+    metadata:
+      labels:
+        app: customer
+    spec:
+      containers:
+        - name: customer
+          image: artsiombarodka/customer:layered
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8083
+          args: [
+            "--spring.cloud.kubernetes.config.name=customer",
+            "--spring.cloud.loadbalancer.ribbon.enabled=false",
+            "--spring.cloud.discovery.locator.enabled=true",
+            "--spring.cloud.kubernetes.loadbalancer.enabled=true",
+            "--spring.cloud.kubernetes.enabled=true",
+            "--logging.file.name=logs/customer/customer.log"]
+          volumeMounts:
+            - mountPath: /opt/logs
+              name: shared-logs-volume
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8083
+            failureThreshold: 30
+            periodSeconds: 40
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8083
+            failureThreshold: 2
+            periodSeconds: 3
+            successThreshold: 1
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8083
+            failureThreshold: 2
+            periodSeconds: 3
+            successThreshold: 1
+      restartPolicy: Always
+      volumes:
+        - name: shared-logs-volume
+          persistentVolumeClaim:
+            claimName: shared-logs-volume-claim

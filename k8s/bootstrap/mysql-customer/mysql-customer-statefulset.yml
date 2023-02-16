@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql-customer-statefulset
+  labels:
+    app: mysql-customer
+spec:
+  serviceName: mysql-customer
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql-customer
+  template:
+    metadata:
+      labels:
+        app: mysql-customer
+    spec:
+      containers:
+        - name: mysql-customer
+          image: mysql:8.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-customer-data
+          envFrom:
+            - configMapRef:
+                name: mysql-customer-config
+      restartPolicy: Always
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-customer-data
+      spec:
+        accessModes:
+          - ReadWriteMany
+        resources:
+          requests:
+            storage: 5Gi

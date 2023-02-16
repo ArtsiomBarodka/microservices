@@ -9,9 +9,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RefreshScope
 public class PropertiesConfig {
-    @Value("${app.service.name}")
-    private String name;
-
     @Value("${app.products.data.path}")
     private String productsDataPath;
 

@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: logstash-statefulset
+  labels:
+    app: logstash
+spec:
+  serviceName: logstash
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logstash
+  template:
+    metadata:
+      labels:
+        app: logstash
+    spec:
+      containers:
+        - name: logstash
+          image: docker.elastic.co/logstash/logstash:8.2.0
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /usr/share/logstash/pipeline/
+              name: logstash-config
+            - mountPath: /usr/logs
+              name: shared-logs-volume
+      restartPolicy: Always
+      volumes:
+        - name: logstash-config
+          configMap:
+            name: logstash-config-map
+        - name: shared-logs-volume
+          persistentVolumeClaim:
+            claimName: shared-logs-volume-claim

@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-gateway
+data:
+  application.properties: |-
+    spring.cloud.loadbalancer.ribbon.enabled=false
+    spring.cloud.discovery.locator.enabled=true
+    spring.cloud.kubernetes.loadbalancer.enabled=true
+    spring.cloud.kubernetes.enabled=true
+    
+    spring.sleuth.sampler.probability=1
+    spring.zipkin.baseUrl=http://zipkin:9411/
+    spring.zipkin.sender.type=web
+
+    spring.cloud.gateway.routes[0].id=order
+    spring.cloud.gateway.routes[0].uri=lb://order
+    spring.cloud.gateway.routes[0].predicates[0]=Path=/api/v1/orders/**
+    spring.cloud.gateway.routes[0].predicates[1]=Method=GET, POST
+    spring.cloud.gateway.routes[0].filters[0]=RemoveRequestHeader=Cookie
+  
+    spring.cloud.gateway.routes[1].id=product-search
+    spring.cloud.gateway.routes[1].uri=lb://product-search
+    spring.cloud.gateway.routes[1].predicates[0]=Path=/api/v1/products/search/**
+    spring.cloud.gateway.routes[1].predicates[1]=Method=GET
+    spring.cloud.gateway.routes[1].filters[0]=RemoveRequestHeader=Cookie
+  
+    spring.cloud.gateway.routes[2].id=product-operation
+    spring.cloud.gateway.routes[2].uri=no://op
+    spring.cloud.gateway.routes[2].predicates[0]=Path=/api/v1/products/operation/**
+    spring.cloud.gateway.routes[2].predicates[1]=Method=PATCH
+    spring.cloud.gateway.routes[2].filters[0]=SetStatus=403
+  
+    spring.cloud.gateway.routes[3].id=product
+    spring.cloud.gateway.routes[3].uri=lb://product
+    spring.cloud.gateway.routes[3].predicates[0]=Path=/api/v1/products/**
+    spring.cloud.gateway.routes[3].predicates[1]=Method=GET, PATCH
+    spring.cloud.gateway.routes[3].filters[0]=RemoveRequestHeader=Cookie
+  
+    spring.cloud.gateway.routes[4].id=customer
+    spring.cloud.gateway.routes[4].uri=lb://customer
+    spring.cloud.gateway.routes[4].predicates[0]=Path=/api/v1/customers/**
+    spring.cloud.gateway.routes[4].predicates[1]=Method=GET, PATCH
+    spring.cloud.gateway.routes[4].filters[0]=RemoveRequestHeader=Cookie

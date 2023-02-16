@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-orchestrator-deployment
+  labels:
+    app: order-orchestrator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-orchestrator
+  template:
+    metadata:
+      labels:
+        app: order-orchestrator
+    spec:
+      containers:
+        - name: order-orchestrator
+          image: artsiombarodka/order-orchestrator:layered
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8084
+          args: [
+            "--spring.cloud.kubernetes.config.name=order-orchestrator",
+            "--spring.cloud.loadbalancer.ribbon.enabled=false",
+            "--spring.cloud.discovery.locator.enabled=true",
+            "--spring.cloud.kubernetes.loadbalancer.enabled=true",
+            "--spring.cloud.kubernetes.enabled=true",
+            "--logging.file.name=logs/order-orchestrator/order-orchestrator.log"]
+          volumeMounts:
+            - mountPath: /opt/logs
+              name: shared-logs-volume
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8084
+            failureThreshold: 30
+            periodSeconds: 40
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8084
+            failureThreshold: 2
+            periodSeconds: 3
+            successThreshold: 1
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8084
+            failureThreshold: 2
+            periodSeconds: 3
+            successThreshold: 1
+      restartPolicy: Always
+      volumes:
+        - name: shared-logs-volume
+          persistentVolumeClaim:
+            claimName: shared-logs-volume-claim

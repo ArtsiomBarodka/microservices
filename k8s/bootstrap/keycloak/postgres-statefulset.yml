@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-keycloak-statefulset
+  labels:
+    app: postgres-keycloak
+spec:
+  serviceName: postgres-keycloak
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-keycloak
+  template:
+    metadata:
+      labels:
+        app: postgres-keycloak
+    spec:
+      containers:
+        - name: postgres-keycloak
+          image: postgres:11
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-keycloak-data
+          envFrom:
+            - configMapRef:
+                name: postgres-keycloak-config
+      restartPolicy: Always
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-keycloak-data
+      spec:
+        accessModes:
+          - ReadWriteMany
+        resources:
+          requests:
+            storage: 5Gi

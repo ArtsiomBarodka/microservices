@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-order
+spec:
+  selector:
+    app: mysql-order
+  ports:
+    - port: 3307
+      targetPort: 3306
+  type: ClusterIP

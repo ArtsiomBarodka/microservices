@@ -2,7 +2,6 @@ package com.my.app.controller;
 
 import com.epam.app.model.request.UpdateOrderStatusRequest;
 import com.epam.app.model.response.OrderStatusResponse;
-import com.my.app.config.PropertiesConfig;
 import com.my.app.facade.OrderFacade;
 import com.my.app.model.converter.FromDtoToResponseOrderConverter;
 import com.my.app.model.converter.FromDtoToResponseOrderStatusConverter;
@@ -14,6 +13,7 @@ import com.my.app.model.request.OrderRequest;
 import com.my.app.model.response.OrderResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -43,20 +43,17 @@ import static java.util.stream.Collectors.toList;
 @RequestMapping("/api/v1/orders")
 public class OrderRestController {
     private OrderFacade orderFacade;
-    private PropertiesConfig propertiesConfig;
+    private DiscoveryClient discoveryClient;
     private FromDtoToResponseOrderConverter toResponseOrderConverter;
     private FromRequestToDtoOrderConverter toDtoOrderConverter;
     private FromUpdateRequestToDtoOrderStatusConverter toDtoOrderStatusConverter;
     private FromDtoToResponseOrderStatusConverter toResponseOrderStatusConverter;
 
-    @GetMapping("/health")
-    public String healthCheck() {
-        return "Hello from " + propertiesConfig.getName();
-    }
-
     @PreAuthorize("hasRole('customer') or hasRole('owner')")
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> getOrderById(@PathVariable @NotNull @Min(1) Long id) {
+        List<String> services = discoveryClient.getServices();
+        log.info("DiscoveryClient services: {}", services);
         final OrderDto result = orderFacade.getOrderById(id);
 
         final OrderResponse convertedResult = toResponseOrderConverter.convert(result);

@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: product
+data:
+  application.properties: |-
+    spring.cloud.loadbalancer.ribbon.enabled=false
+    spring.cloud.discovery.locator.enabled=true
+    spring.cloud.kubernetes.loadbalancer.enabled=true
+    spring.cloud.kubernetes.enabled=true
+    
+    spring.sleuth.sampler.probability=1
+    spring.zipkin.baseUrl=http://zipkin:9411/
+    spring.zipkin.sender.type=web
+    
+    spring.batch.job.enabled=true
+
+    app.products.data.path=data/products_data.csv
+    app.products.data.collection=product
+  
+    spring.data.mongodb.authentication-database=admin
+    spring.data.mongodb.host=mongo
+    spring.data.mongodb.port=27017
+    spring.data.mongodb.username=user
+    spring.data.mongodb.password=password
+    spring.data.mongodb.database=product
+    
+    kafka.productSearch.bootstrapAddress=kafka:9092
+    kafka.productSearch.topic.product.name=product
+  
+    spring.security.oauth2.resourceserver.jwt.issuer-uri=http://keycloak:8090/auth/realms/spring-microservice
+    spring.security.oauth2.resourceserver.jwt.jwk-set-uri=http://keycloak:8090/auth/realms/spring-microservice/protocol/openid-connect/certs

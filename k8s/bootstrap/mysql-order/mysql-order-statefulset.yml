@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql-order-statefulset
+  labels:
+    app: mysql-order
+spec:
+  serviceName: mysql-order
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql-order
+  template:
+    metadata:
+      labels:
+        app: mysql-order
+    spec:
+      containers:
+        - name: mysql-order
+          image: mysql:8.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-order-data
+          envFrom:
+            - configMapRef:
+                name: mysql-order-config
+      restartPolicy: Always
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-order-data
+      spec:
+        accessModes:
+          - ReadWriteMany
+        resources:
+          requests:
+            storage: 5Gi

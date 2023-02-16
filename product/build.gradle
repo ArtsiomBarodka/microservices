@@ -1,13 +1,12 @@
 dependencies {
     implementation project(':common')
 
-    implementation('org.springframework.cloud:spring-cloud-config-client')
-    implementation("org.springframework.cloud:spring-cloud-starter-bus-kafka")
-    implementation('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
     implementation('org.springframework.cloud:spring-cloud-starter-sleuth')
     implementation('org.springframework.cloud:spring-cloud-sleuth-zipkin')
+    implementation('org.springframework.cloud:spring-cloud-starter-kubernetes-client-all')
 
     implementation('org.springframework.boot:spring-boot-starter-data-mongodb')
+    implementation('org.springframework.boot:spring-boot-starter-validation')
     implementation('org.springframework.boot:spring-boot-starter-batch')
     implementation('org.springframework.boot:spring-boot-starter-validation')
     implementation('org.springframework.boot:spring-boot-starter-oauth2-resource-server')

@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway-deployment
+  labels:
+    app: api-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+        - name: api-gateway
+          image: artsiombarodka/api-gateway:layered
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8887
+          args: [
+            "--spring.main.web-application-type=reactive",
+            "--spring.cloud.kubernetes.config.name=api-gateway",
+            "--spring.cloud.loadbalancer.ribbon.enabled=false",
+            "--spring.cloud.discovery.locator.enabled=true",
+            "--spring.cloud.kubernetes.loadbalancer.enabled=true",
+            "--spring.cloud.kubernetes.enabled=true",
+            "--logging.file.name=logs/api-gateway/api-gateway.log"]
+          volumeMounts:
+            - mountPath: /opt/logs
+              name: shared-logs-volume
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8887
+            failureThreshold: 30
+            periodSeconds: 40
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8887
+            failureThreshold: 2
+            periodSeconds: 3
+            successThreshold: 1
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8887
+            failureThreshold: 2
+            periodSeconds: 3
+            successThreshold: 1
+      restartPolicy: Always
+      volumes:
+        - name: shared-logs-volume
+          persistentVolumeClaim:
+            claimName: shared-logs-volume-claim
