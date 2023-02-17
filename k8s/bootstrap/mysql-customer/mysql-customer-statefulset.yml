@@ -26,7 +26,9 @@ spec:
               name: mysql-customer-data
           envFrom:
             - configMapRef:
-                name: mysql-customer-config
+                name: mysql-customer-configmap
+            - secretRef:
+                name: mysql-customer-secret
       restartPolicy: Always
   volumeClaimTemplates:
     - metadata:

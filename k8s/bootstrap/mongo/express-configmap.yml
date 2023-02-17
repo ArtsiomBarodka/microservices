@@ -1,11 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: mongo-express-config
+  name: mongo-express-configmap
 data:
-  ME_CONFIG_MONGODB_SERVER: mongo
   ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
-  ME_CONFIG_MONGODB_ADMINUSERNAME: user
-  ME_CONFIG_MONGODB_ADMINPASSWORD: password
-  ME_CONFIG_BASICAUTH_USERNAME: admin
-  ME_CONFIG_BASICAUTH_PASSWORD: password
+  ME_CONFIG_MONGODB_SERVER: mongo

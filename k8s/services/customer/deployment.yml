@@ -23,6 +23,9 @@ spec:
           volumeMounts:
             - mountPath: /opt/logs
               name: shared-logs-volume
+          envFrom:
+            - secretRef:
+                name: customer
           startupProbe:
             httpGet:
               path: /actuator/health

@@ -26,7 +26,9 @@ spec:
               name: postgres-keycloak-data
           envFrom:
             - configMapRef:
-                name: postgres-keycloak-config
+                name: postgres-keycloak-configmap
+            - secretRef:
+                name: postgres-keycloak-secret
       restartPolicy: Always
   volumeClaimTemplates:
     - metadata:

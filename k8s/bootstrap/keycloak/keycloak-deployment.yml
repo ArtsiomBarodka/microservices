@@ -22,5 +22,7 @@ spec:
             - containerPort: 8080
           envFrom:
             - configMapRef:
-                name: keycloak-config
+                name: keycloak-configmap
+            - secretRef:
+                name: keycloak-secret
       restartPolicy: Always

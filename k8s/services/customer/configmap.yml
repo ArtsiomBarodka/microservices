@@ -11,8 +11,6 @@ data:
     logging.file.name=logs/customer/customer.log
 
     spring.datasource.url=jdbc:mysql://mysql-customer:3308/microservices?useSSL=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
-    spring.datasource.username=user
-    spring.datasource.password=password
     spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
     spring.datasource.hikari.maximum-pool-size=5
   

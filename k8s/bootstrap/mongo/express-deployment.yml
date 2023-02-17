@@ -22,5 +22,7 @@ spec:
             - containerPort: 8081
           envFrom:
             - configMapRef:
-                name: mongo-express-config
+                name: mongo-express-configmap
+            - secretRef:
+                name: mongo-express-secret
       restartPolicy: Always

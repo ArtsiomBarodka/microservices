@@ -1,12 +1,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: keycloak-config
+  name: keycloak-configmap
 data:
-  KEYCLOAK_USER: admin
-  KEYCLOAK_PASSWORD: admin
-  DB_USER: postgres
-  DB_PASSWORD: postgres
   DB_VENDOR: postgres
   DB_ADDR: postgres-keycloak
   DB_PORT: "5406"
