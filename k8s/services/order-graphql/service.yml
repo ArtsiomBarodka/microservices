@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-graphql
+spec:
+  selector:
+    app: order-graphql
+  ports:
+    - port: 8086
+      targetPort: 8086
+  type: LoadBalancer

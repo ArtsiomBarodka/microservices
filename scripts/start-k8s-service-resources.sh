@@ -24,6 +24,7 @@ runK8sResource service/order order
 runK8sResource service/order-orchestrator order-orchestrator
 runK8sResource service/product product
 runK8sResource service/product-search product-search
+runK8sResource service/order-graphql order-graphql
 
 kubectl get pods
 sleep 10s

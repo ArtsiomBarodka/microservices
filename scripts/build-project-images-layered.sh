@@ -36,6 +36,7 @@ unpack customer customer
 unpack api-gateway api-gateway
 unpack order-orchestrator order-orchestrator
 unpack product-search product-search
+unpack order-graphql order-graphql
 
 echo "Building Docker image"
 build product artsiombarodka/product
@@ -44,3 +45,4 @@ build customer artsiombarodka/customer
 build api-gateway artsiombarodka/api-gateway
 build order-orchestrator artsiombarodka/order-orchestrator
 build product-search artsiombarodka/product-search
+build order-graphql application/order-graphql

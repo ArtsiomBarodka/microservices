@@ -10,23 +10,11 @@ data:
 
     app.client.products.host=http://product
     app.client.customers.host=http://customer
+    app.client.orders.host=http://order
     
-    logging.file.name=logs/order/order.log
+    logging.file.name=logs/order-graphql/order-graphql.log
   
-    kafka.orderOrchestrator.bootstrapAddress=kafka:9092
-    kafka.orderOrchestrator.topic.newOrder.name=newOrder
-  
-    spring.datasource.url=jdbc:mysql://mysql-order:3307/microservices?useSSL=true&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
-    spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-    spring.datasource.hikari.maximum-pool-size=5
-  
-    spring.jpa.show-sql=true
-    spring.jpa.hibernate.ddl-auto=create
-    spring.jpa.defer-datasource-initialization=true
-    spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL5InnoDBDialect
-    spring.jpa.properties.hibernate.format_sql=true
-  
-    spring.sql.init.mode=always
+    spring.graphql.graphiql.enabled=true
   
     spring.security.oauth2.resourceserver.jwt.issuer-uri=http://keycloak:8090/auth/realms/spring-microservice
     spring.security.oauth2.resourceserver.jwt.jwk-set-uri=http://keycloak:8090/auth/realms/spring-microservice/protocol/openid-connect/certs
@@ -48,3 +36,12 @@ data:
     resilience4j.circuitbreaker.instances.product.permittedNumberOfCallsInHalfOpenState=3
     resilience4j.circuitbreaker.instances.product.waitDurationInOpenState=1m
     resilience4j.circuitbreaker.instances.product.ignoreExceptions[0]=com.my.app.model.exception.ApiClientErrorException
+    
+    resilience4j.circuitbreaker.instances.order.registerHealthIndicator=true
+    resilience4j.circuitbreaker.instances.order.slidingWindowSize=10
+    resilience4j.circuitbreaker.instances.order.minimumNumberOfCalls=7
+    resilience4j.circuitbreaker.instances.order.failureRateThreshold=60
+    resilience4j.circuitbreaker.instances.order.slowCallDurationThreshold=10s
+    resilience4j.circuitbreaker.instances.order.permittedNumberOfCallsInHalfOpenState=3
+    resilience4j.circuitbreaker.instances.order.waitDurationInOpenState=1m
+    resilience4j.circuitbreaker.instances.order.ignoreExceptions[0]=com.my.app.model.exception.ApiClientErrorException

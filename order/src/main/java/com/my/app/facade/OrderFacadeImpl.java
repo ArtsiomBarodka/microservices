@@ -38,34 +38,38 @@ public class OrderFacadeImpl implements OrderFacade {
 
     @Override
     @NonNull
-    public OrderDto getOrderById(@NonNull Long id) {
+    public OrderDto getOrderById(@NonNull Long id, boolean isDetailed) {
         // fetching order
         OrderDto order = orderService.getOrderById(id);
 
-        // fetching products
-        final Map<String, ProductDto> productsMap = getProductsMap(List.of(order));
-        populateOrdersByProducts(List.of(order), productsMap, false);
+        if (isDetailed) {
+            // fetching products
+            final Map<String, ProductDto> productsMap = getProductsMap(List.of(order));
+            populateOrdersByProducts(List.of(order), productsMap, false);
 
-        //fetching user
-        final UserDto user = userService.getUserById(order.getUser().getId());
-        order.setUser(user);
+            //fetching user
+            final UserDto user = userService.getUserById(order.getUser().getId());
+            order.setUser(user);
+        }
 
         return order;
     }
 
     @Override
     @NonNull
-    public Collection<OrderDto> getAllOrdersByUserId(@NonNull Long id) {
+    public Collection<OrderDto> getAllOrdersByUserId(@NonNull Long id, boolean isDetailed) {
         // fetching orders
         Collection<OrderDto> orders = orderService.getAllOrdersByUserId(id);
 
-        // fetching products
-        final Map<String, ProductDto> productsMap = getProductsMap(orders);
-        populateOrdersByProducts(orders, productsMap, false);
+        if (isDetailed) {
+            // fetching products
+            final Map<String, ProductDto> productsMap = getProductsMap(orders);
+            populateOrdersByProducts(orders, productsMap, false);
 
-        //fetching user
-        final UserDto user = userService.getUserById(id);
-        orders.forEach(order -> order.setUser(user));
+            //fetching user
+            final UserDto user = userService.getUserById(id);
+            orders.forEach(order -> order.setUser(user));
+        }
 
         return orders;
     }

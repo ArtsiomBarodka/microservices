@@ -48,9 +48,33 @@ public class OrderRestController {
     private FromDtoToResponseOrderStatusConverter toResponseOrderStatusConverter;
 
     @PreAuthorize("hasRole('customer') or hasRole('owner')")
+    @GetMapping("/{id}/plain")
+    public ResponseEntity<OrderResponse> getOrderByIdPlain(@PathVariable @NotNull @Min(1) Long id) {
+        final OrderDto result = orderFacade.getOrderById(id, false);
+
+        final OrderResponse convertedResult = toResponseOrderConverter.convert(result);
+        log.info("Order response for (id = {}). Order: {}", id, convertedResult);
+
+        return ResponseEntity.ok(convertedResult);
+    }
+
+    @PreAuthorize("hasRole('customer') or hasRole('owner')")
+    @GetMapping("/user/{id}/plain")
+    public ResponseEntity<List<OrderResponse>> getAllOrdersByUserIdPlain(@PathVariable @NotNull @Min(1) Long id) {
+        final Collection<OrderDto> result = orderFacade.getAllOrdersByUserId(id, false);
+
+        final List<OrderResponse> convertedResult = result.stream()
+                .map(order -> toResponseOrderConverter.convert(order))
+                .collect(toList());
+        log.info("Orders response for (userId = {}). Orders: {}", id, convertedResult);
+
+        return ResponseEntity.ok(convertedResult);
+    }
+
+    @PreAuthorize("hasRole('customer') or hasRole('owner')")
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> getOrderById(@PathVariable @NotNull @Min(1) Long id) {
-        final OrderDto result = orderFacade.getOrderById(id);
+        final OrderDto result = orderFacade.getOrderById(id, true);
 
         final OrderResponse convertedResult = toResponseOrderConverter.convert(result);
         log.info("Order response for (id = {}). Order: {}", id, convertedResult);
@@ -61,7 +85,7 @@ public class OrderRestController {
     @PreAuthorize("hasRole('customer') or hasRole('owner')")
     @GetMapping("/user/{id}")
     public ResponseEntity<List<OrderResponse>> getAllOrdersByUserId(@PathVariable @NotNull @Min(1) Long id) {
-        final Collection<OrderDto> result = orderFacade.getAllOrdersByUserId(id);
+        final Collection<OrderDto> result = orderFacade.getAllOrdersByUserId(id, true);
 
         final List<OrderResponse> convertedResult = result.stream()
                 .map(order -> toResponseOrderConverter.convert(order))

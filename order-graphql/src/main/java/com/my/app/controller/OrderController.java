@@ -24,9 +24,10 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toMap;
 
+
 @AllArgsConstructor
 @Controller
-public class OrderGraphQLController {
+public class OrderController {
     private OrderService orderService;
     private UserService userService;
     private ProductService productService;

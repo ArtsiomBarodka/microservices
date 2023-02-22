@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-graphql
+  labels:
+    app: order-graphql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-graphql
+  template:
+    metadata:
+      labels:
+        app: order-graphql
+    spec:
+      containers:
+        - name: order-graphql
+          image: artsiombarodka/order-graphql:layered
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8086
+          volumeMounts:
+            - mountPath: /opt/logs
+              name: shared-logs-volume
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8086
+            failureThreshold: 30
+            periodSeconds: 40
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8086
+            failureThreshold: 2
+            periodSeconds: 3
+            successThreshold: 1
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8086
+            failureThreshold: 2
+            periodSeconds: 3
+            successThreshold: 1
+      restartPolicy: Always
+      volumes:
+        - name: shared-logs-volume
+          persistentVolumeClaim:
+            claimName: shared-logs-volume-claim
