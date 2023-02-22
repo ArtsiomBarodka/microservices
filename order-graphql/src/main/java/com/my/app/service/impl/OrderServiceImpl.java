@@ -10,8 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
@@ -26,7 +24,6 @@ public class OrderServiceImpl implements OrderService {
     private final FromResponseToDtoOrderConverter toDtoOrderConverter;
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     @NonNull
     public OrderDto getOrderById(@NonNull Long id) {
         final OrderResponse orderResponse = orderClient.getOrderById(id)
@@ -41,7 +38,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     @NonNull
     public Collection<OrderDto> getAllOrdersByUserId(@NonNull Long id) {
         final List<OrderResponse> orderResponse = orderClient.getAllOrdersByUserId(id);
