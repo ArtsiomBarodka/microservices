@@ -9,10 +9,10 @@ import java.util.Collection;
 
 public interface OrderFacade {
     @NonNull
-    OrderDto getOrderById(@NonNull Long id);
+    OrderDto getOrderById(@NonNull Long id, boolean isDetailed);
 
     @NonNull
-    Collection<OrderDto> getAllOrdersByUserId(@NonNull Long id);
+    Collection<OrderDto> getAllOrdersByUserId(@NonNull Long id, boolean isDetailed);
 
     @NonNull
     OrderDto createOrder(@NonNull OrderDto order);

@@ -1,7 +1,6 @@
 package com.my.app.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -15,10 +14,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,10 +25,6 @@ import java.util.stream.Collectors;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @Configuration
 public class SecurityConfig {
-    @Autowired
-    @Qualifier("handlerExceptionResolver")
-    private HandlerExceptionResolver exceptionResolver;
-
     @Autowired
     private PropertiesConfig propertiesConfig;
 
@@ -49,13 +41,13 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests()
                 .antMatchers("/actuator/**").permitAll()
+                .antMatchers("/graphiql/**").permitAll()
+                .antMatchers("/graphql/**").permitAll()
+                .antMatchers("/favicon.ico").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .oauth2ResourceServer()
-                .jwt().jwtAuthenticationConverter(jwtAuthenticationConverter).decoder(jwtDecoder())
-                .and()
-                .authenticationEntryPoint(delegatedAuthenticationEntryPoint())
-                .accessDeniedHandler(delegatedAccessDeniedHandler());
+                .jwt().jwtAuthenticationConverter(jwtAuthenticationConverter).decoder(jwtDecoder());
 
         return http.build();
     }
@@ -80,18 +72,6 @@ public class SecurityConfig {
                     .map(roleName -> "ROLE_" + roleName)
                     .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
-        };
-    }
-
-    private AuthenticationEntryPoint delegatedAuthenticationEntryPoint() {
-        return (request, response, authException) -> {
-            exceptionResolver.resolveException(request, response, null, authException);
-        };
-    }
-
-    private AccessDeniedHandler delegatedAccessDeniedHandler() {
-        return (request, response, accessDeniedException) -> {
-            exceptionResolver.resolveException(request, response, null, accessDeniedException);
         };
     }
 }

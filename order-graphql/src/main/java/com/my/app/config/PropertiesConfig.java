@@ -9,17 +9,14 @@ import org.springframework.stereotype.Component;
 @Component
 @RefreshScope
 public class PropertiesConfig {
-    @Value("${app.products.data.path}")
-    private String productsDataPath;
+    @Value("${app.client.products.host}")
+    private String productsHost;
 
-    @Value("${app.products.data.collection}")
-    private String productsCollection;
+    @Value("${app.client.customers.host}")
+    private String customersHost;
 
-    @Value("${kafka.productSearch.bootstrapAddress}")
-    private String kafkaServer;
-
-    @Value("${kafka.productSearch.topic.product.name}")
-    private String kafkaTopicProductName;
+    @Value("${app.client.orders.host}")
+    private String ordersHost;
 
     @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}")
     private String securityJwkSetUri;

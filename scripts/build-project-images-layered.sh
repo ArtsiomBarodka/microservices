@@ -36,6 +36,7 @@ unpack customer customer
 unpack api-gateway api-gateway
 unpack order-orchestrator order-orchestrator
 unpack product-search product-search
+unpack order-graphql order-graphql
 
 echo "Building Docker image"
 build config-server application/config-server
@@ -46,3 +47,4 @@ build customer application/customer
 build api-gateway application/api-gateway
 build order-orchestrator application/order-orchestrator
 build product-search application/product-search
+build order-graphql application/order-graphql

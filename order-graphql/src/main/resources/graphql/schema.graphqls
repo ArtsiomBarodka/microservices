@@ -12,6 +12,7 @@ type Order {
     status: Status!
     created: LocalDateTime!
     orderItems: [OrderItem!]!
+    totalCost: BigDecimal!
 }
 
 type User {

@@ -278,6 +278,44 @@ services:
       SPRING_PROFILES_ACTIVE: withoutLoadBalancer
       LOGGING_FILE_NAME: logs/order/order.log
 
+  order-graphql:
+    image: application/order-graphql:latest
+    volumes:
+      - shared_logs_volume:/opt/logs
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      order:
+        condition: service_healthy
+      customer:
+        condition: service_healthy
+      product:
+        condition: service_healthy
+    ports:
+      - "8086:8086"
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8086/actuator/health" ]
+      interval: 30s
+      timeout: 5s
+      retries: 7
+    environment:
+      SERVER_PORT: 8086
+      EUREKA_CLIENT_ENABLED: "false"
+      CONFIG_URI: http://config-server:8888/
+      KAFKA_URI: http://kafka:9092
+      ZIPKIN_URI: http://zipkin:9411/
+      PRODUCT_URI: http://product:8082
+      CUSTOMER_URI: http://customer:8083
+      ORDER_URI: http://order:8081
+      RESOURCE_SERVER_URI: http://keycloak:8080
+      LOGGING_FILE_NAME: logs/order-graphql/order-graphql.log
+      SPRING_PROFILES_ACTIVE: withoutLoadBalancer
+
   product-search:
     image: application/product-search:latest
     volumes:

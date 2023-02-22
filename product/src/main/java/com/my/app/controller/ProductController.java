@@ -4,7 +4,6 @@ import com.epam.app.model.request.ProductListRequest;
 import com.epam.app.model.request.ProductRequest;
 import com.epam.app.model.request.UpdateProductListRequest;
 import com.epam.app.model.response.ProductResponse;
-import com.my.app.config.PropertiesConfig;
 import com.my.app.facade.ProductFacade;
 import com.my.app.model.UpdateOperationType;
 import com.my.app.model.converter.FromDtoToResponseProductConverter;
@@ -36,15 +35,9 @@ import static java.util.stream.Collectors.toList;
 @RestController
 @RequestMapping("/api/v1/products")
 public class ProductController {
-    private PropertiesConfig propertiesConfig;
     private ProductFacade productFacade;
     private FromDtoToResponseProductConverter toResponseProductConverter;
     private FromRequestToDtoOrderProductListConverter toDtoProductConverter;
-
-    @GetMapping("/health")
-    public String healthCheck() {
-        return "Hello from " + propertiesConfig.getName();
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable @NotBlank String id) {
