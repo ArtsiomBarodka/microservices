@@ -34,6 +34,11 @@ data:
              path => "/usr/logs/customer/*.log"
              type => "customer"
         }
+    
+        file {
+             path => "/usr/logs/order-graphql/*.log"
+             type => "order-graphql"
+        }
     }
 
     output {
@@ -66,6 +71,11 @@ data:
             elasticsearch {
                  hosts => [ "elasticsearch:9200" ]
                  index => "product-search-%{+YYYY-MM-dd}"
+            }
+        } else if [type] == "order-graphql" {
+            elasticsearch {
+                 hosts => [ "elasticsearch:9200" ]
+                 index => "order-graphql-%{+YYYY-MM-dd}"
             }
         }
 
