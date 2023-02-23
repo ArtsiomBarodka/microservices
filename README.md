@@ -22,7 +22,7 @@ Two versions of Docker Compose based application:
 **Other**: Git, Rest API, GraphQL API, ELK (ElasticSearch, Logstash, Kibana), Zipkin, SAGA, Event-driven;
 
 # Diagram
-
+![DockerComposeBased drawio](https://user-images.githubusercontent.com/34836796/220936309-f239f530-1d82-44fa-a706-37cd9c7b9dbc.png)
 
 # Usage
 
