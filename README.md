@@ -18,7 +18,7 @@ It was created two version of application:
 **Other**: Git, Rest API, GraphQL API, ELK (ElasticSearch, Logstash, Kibana), Zipkin, SAGA, Event-driven;
 
 # Diagram
-
+![KubernetesBased drawio](https://user-images.githubusercontent.com/34836796/220975280-deb51d34-5881-412c-943f-3bbf603b6422.png)
 
 # Usage
 
